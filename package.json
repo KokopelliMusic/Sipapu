@@ -1,0 +1,56 @@
+{
+  "name": "sipapu",
+  "version": "1.0.0",
+  "description": "Sipapu: A library for the Kokopelli app and webplayer",
+  "main": "dist/Sipapu.js",
+  "umd:main": "dist/Sipapu.umd.js",
+  "module": "dist/Sipapu.mjs",
+  "files": [
+    "dist",
+    "readme.md"
+  ],
+  "dependencies": {
+    "@supabase/supabase-js": "^1.29.1",
+    "supabase": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-formatter-pretty": "^4.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^24.0.2",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-unicorn": "^32.0.1",
+    "jest": "^26.4.2",
+    "microbundle": "^0.13.0",
+    "prettier": "^2.0.4",
+    "ts-jest": "^26.3.0",
+    "typescript": "^4.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KokopelliMusic/Sipapu"
+  },
+  "keywords": [],
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "dist",
+      "coverage"
+    ],
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    }
+  },
+  "author": "Nierot",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/KokopelliMusic/Sipapu/issues"
+  },
+  "homepage": "https://github.com/KokopelliMusic/Sipapu#readme"
+}
