@@ -1,5 +1,6 @@
 import { SupabaseClient, SupabaseRealtimePayload } from '@supabase/supabase-js'
-import { PlaylistType } from './playlist';
+import { ISipapu } from '..'
+import { PlaylistType } from './playlist'
 
 type SessionType = {
   id: string
@@ -13,9 +14,11 @@ type SessionType = {
  */
 export default class Session {
   private client: SupabaseClient;
+  private sipapu: ISipapu;
 
-  constructor(client: SupabaseClient) {
+  constructor(client: SupabaseClient, sipapu: ISipapu) {
     this.client = client
+    this.sipapu = sipapu
   }
 
   /**
