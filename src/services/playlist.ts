@@ -26,6 +26,29 @@ export default class Playlist {
   }
 
   /**
+   * Creates a playlist for the given user with the given name
+   * Initialized the users array with the current user
+   * @param name The name of the playlist
+   * @param user The user to create the playlist for
+   * @param username The username of the user to create the playlist for
+   * @returns {@link Promise<PlaylistType>} The created playlist
+   * @throws {@link Error} If the user doesn't exist or the user doesn't have access to it
+   */
+  async create(name: string, user: string, username: string): Promise<void> {
+    const { error } = await this.client
+      .from('playlist')
+      .insert({
+        name,
+        user,
+        users: [username]
+      })
+
+    if (error !== null) {
+      throw error
+    }
+  }
+
+  /**
    * Get a playlist by its id.
    * @param playlistId 
    * @returns 
