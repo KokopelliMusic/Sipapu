@@ -113,4 +113,22 @@ export default class Playlist {
     return playlists
     
   }
+
+  /**
+   * Resets an entire playlists play count to 0
+   * @param playlistId The playlist to reset
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+     async resetPlaylist(playlistId: number): Promise<void> {
+      const { error } = await this.client
+        .from('song')
+        .update({
+          play_count: 0
+        })
+        .match({ playlist: playlistId })
+  
+      if (error !== null) {
+        throw error
+      }
+    }
 }
