@@ -54,6 +54,7 @@ module.exports = {
     "quotes": [
       "warn",
       "single",
-    ]
+    ],
+    "unicorn/no-array-for-each": "off"
   },
 }
