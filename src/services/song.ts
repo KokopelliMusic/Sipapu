@@ -21,6 +21,26 @@ export type SongType = {
   album?: string
 }
 
+export type SongCreateType = {
+  title: string,
+  platformId: string,
+  addedBy: string,
+  playlistId: number,  
+  playCount: 0
+}
+
+export type YoutubeSongCreateType = SongCreateType & {
+  songType: SongEnum.YOUTUBE
+}
+
+export type SpotifySongCreateType = SongCreateType & {
+  songType: SongEnum.SPOTIFY,
+  artist: string,
+  cover: string,
+  length: number,
+  album: string
+}
+
 export default class Song {
   private client: SupabaseClient
   private sipapu: ISipapu
@@ -63,6 +83,22 @@ export default class Song {
       cover: data[0].cover,
       length: data[0].length,
       album: data[0].album
+    }
+  }
+
+  /**
+   * Deletes a given song
+   * @param songId The song to delete
+   * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
+   */
+  async delete(songId: string): Promise<void> {
+    const { error } = await this.client
+      .from('song')
+      .delete()
+      .match({ id: songId })
+
+    if (error !== null) {
+      throw error
     }
   }
 
