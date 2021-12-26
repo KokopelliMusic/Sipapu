@@ -26,7 +26,6 @@ export type SongCreateType = {
   platformId: string,
   addedBy: string,
   playlistId: number,  
-  playCount: 0
 }
 
 export type YoutubeSongCreateType = SongCreateType & {
@@ -84,6 +83,28 @@ export default class Song {
       length: data[0].length,
       album: data[0].album
     }
+  }
+
+  /**
+   * Create a youtube song in the database
+   * @param song {@link YoutubeSongCreateType} The youtube song to create
+   * @throws {@link PostgrestError} If the song already exists
+   */
+  async createYoutube(song: YoutubeSongCreateType): Promise<void> {
+    const { error } = await this.client
+      .from('song')
+      .insert({
+        play_count: 0,
+        added_by: song.addedBy,
+        song_type: SongEnum.YOUTUBE,
+        platform_id: song.platformId,
+        playlist: song.playlistId,
+        title: song.title,
+      })
+
+      if (error !== null) {
+        throw error
+      }
   }
 
   /**
