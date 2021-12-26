@@ -55,7 +55,7 @@ export default class Song {
    * @returns {@link SongType} The song
    * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
    */
-  async get(songId: string): Promise<SongType> {
+  async get(songId: number): Promise<SongType> {
     const { data, error } = await this.client
       .from('song')
       .select()
@@ -271,5 +271,30 @@ export default class Song {
     }
 
     return data[0].play_count
+  }
+
+  /**
+   * Increment the playCount for a song
+   *
+   * @param songId The song to increment
+   * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
+   */
+  async incrmentPlayCount(songId: number): Promise<void> {
+    try {
+      const song = await this.get(songId)
+
+      const { error } = await this.client
+      .from('song')
+      .update({
+        play_count: song.playCount + 1
+      })
+      .match({ id: songId })
+
+      if (error !== null) {
+        throw error
+      }
+    } catch (error) {
+      throw error
+    }
   }
 }
