@@ -142,6 +142,10 @@ export default class Playlist {
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
   async addUser(playlistId: number, username: string): Promise<void> {
+    if (await this.hasUsername(playlistId, username)) {
+      return
+    }
+
     const { data, error } = await this.client
       .from('playlist')
       .select()
@@ -166,6 +170,30 @@ export default class Playlist {
     if (res.error) {
       throw res.error
     }
+  }
+
+  /**
+   * Checks if the username already is in the list of users
+   * @param playlistId The playlist to check
+   * @param username The username to check
+   * @returns boolean If the user is in the list of users
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async hasUsername(playlistId: number, username: string): Promise<boolean> {
+    const { data, error } = await this.client
+      .from('playlist')
+      .select()
+      .match({ id: playlistId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null) {
+      throw new Error('Playlist not found')
+    }
+
+    return data[0].users.includes(username)
   }
 
 }
