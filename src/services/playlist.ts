@@ -14,6 +14,8 @@ export type PlaylistWithSongsType = PlaylistType & {
   songs: SongType[]
 }
 
+export const MAX_PLAYS = 3
+
 export default class Playlist {
   private client: SupabaseClient;
   private sipapu: ISipapu;
@@ -229,6 +231,22 @@ export default class Playlist {
     try {
       const users = await this.getUsers(playlistId)
       return users.length
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * Get all songs that are played less than {@link MAX_PLAYS} times
+   * @param playlistId The playlist to query
+   * @returns {@link Promise<SongType[]>} The songs that are played less than {@link MAX_PLAYS} times
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async getSongsNotPlayedEnough(playlistId: number): Promise<SongType[]> {
+    try {
+      const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
+      const songsNotPlayed = songs.filter(song => song.playCount < MAX_PLAYS)
+      return songsNotPlayed
     } catch (error) {
       throw error
     }
