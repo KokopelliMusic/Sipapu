@@ -1,9 +1,15 @@
 import { createClient, SupabaseClient, SupabaseClientOptions, User } from '@supabase/supabase-js'
+import Playlist from './services/playlist'
 import Session from './services/session'
+import Song from './services/song'
 import { settings } from './settings'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ISipapu {}
+export interface ISipapu {
+  Session: Session
+  Playlist: Playlist
+  Song: Song
+}
 
 /**
  * A Sipapu client.
@@ -16,6 +22,8 @@ interface ISipapu {}
 export default class Sipapu implements ISipapu {
   private client: SupabaseClient
   Session: Session
+  Playlist: Playlist
+  Song: Song
 
   constructor(apiKey: string) {
     const options: SupabaseClientOptions = {
@@ -25,7 +33,9 @@ export default class Sipapu implements ISipapu {
     }
 
     this.client = createClient(settings.supabaseUrl, settings.supabaseKey, options)
-    this.Session = new Session(this.client)
+    this.Session = new Session(this.client, this)
+    this.Playlist = new Playlist(this.client, this)
+    this.Song = new Song(this.client, this)
   }
 
   /**
@@ -76,10 +86,15 @@ export default class Sipapu implements ISipapu {
 export class AnonymousSipapu implements ISipapu {
   private client: SupabaseClient
   Session: Session
+  Playlist: Playlist
+  Song: Song
+
 
   constructor() {
     this.client = createClient(settings.supabaseUrl, settings.supabaseKey)
-    this.Session = new Session(this.client)
+    this.Session = new Session(this.client, this)
+    this.Playlist = new Playlist(this.client, this)
+    this.Song = new Song(this.client, this)
   }
 
   /**
