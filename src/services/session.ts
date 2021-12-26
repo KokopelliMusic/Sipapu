@@ -66,12 +66,14 @@ export default class Session {
       .from('session')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on('UPDATE', (payload: SupabaseRealtimePayload<any>) => {
-        callback({
-          id: payload.new.id,
-          createdAt: new Date(payload.new.created_at),
-          user: payload.new.user,
-          playlistId: payload.new.playlist
-        })
+        if (payload.new.id === sessionId) {
+          callback({
+            id: payload.new.id,
+            createdAt: new Date(payload.new.created_at),
+            user: payload.new.user,
+            playlistId: payload.new.playlist
+          })
+        }
       })
       .subscribe()
   }
@@ -81,9 +83,17 @@ export default class Session {
    * @param sessionId 
    * @returns 
    */
-  async getPlaylistId(sessionId: string): Promise<PlaylistType> {
-    // return await this.get(sessionId).then(session => {
-    // })
+  async getPlaylist(sessionId: string): Promise<PlaylistType> {
+    try {
+      const session = await this.get(sessionId)
+      if (session === undefined) {
+        throw new Error('Session not found')
+      }
+
+      return this.sipapu.Playlist.get(session.playlistId)
+    } catch (error) {
+      throw error
+    }
   }
 
 }
