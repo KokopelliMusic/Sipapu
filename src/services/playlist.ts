@@ -1,4 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { ISipapu } from "..";
+import { SongType } from "./song";
 
 export type PlaylistType = {
   id: number
@@ -7,13 +9,24 @@ export type PlaylistType = {
   user: string
 }
 
+export type PlaylistWithSongsType = PlaylistType & {
+  songs: SongType[]
+}
+
 export default class Playlist {
   private client: SupabaseClient;
+  private sipapu: ISipapu;
 
-  constructor(client: SupabaseClient) {
+  constructor(client: SupabaseClient, sipapu: ISipapu) {
     this.client = client
+    this.sipapu = sipapu
   }
 
+  /**
+   * Get a playlist by its id.
+   * @param playlistId 
+   * @returns 
+   */
   async get(playlistId: string): Promise<PlaylistType> {
     const { data, error } = await this.client
       .from('playlist')
@@ -36,6 +49,30 @@ export default class Playlist {
     }
   }
 
+  /**
+   * Get a playlist with all songs that are in this playlist
+   * @param playlistId The playlist id to query
+   * @returns {@link PlaylistWithSongsType} The playlist with all songs
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async getWithSongs(playlistId: string): Promise<PlaylistWithSongsType> {
+    try {
+      const playlist = await this.get(playlistId)
+      const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
+      return {
+        ...playlist,
+        songs,
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * Get all playlists from the current authenticated user.
+   * NOTE: this only works when the class is not anonymous.
+   * @returns {@link PlaylistType[]} The playlists that the user has access to
+   */
   async getAllFromUser(): Promise<PlaylistType[]> {
     const uid = this.client.auth.user()?.id
 
