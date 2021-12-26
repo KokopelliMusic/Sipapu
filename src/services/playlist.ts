@@ -252,4 +252,19 @@ export default class Playlist {
     }
   }
 
+  /**
+   * Gets the number of songs that are in the given playlist
+   * @param playlistId The playlist to get the number of songs from
+   * @returns {@link Promise<number>} The number of songs in the playlist
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async getNumberOfSongs(playlistId: number): Promise<number> {
+    try {
+      const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
+      return songs.length
+    } catch (error) {
+      throw error
+    }
+  }
+
 }
