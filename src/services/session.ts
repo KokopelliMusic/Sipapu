@@ -83,6 +83,29 @@ export default class Session {
   }
 
   /**
+   * Set the user for the given session
+   * @param sessionId The session to set the user for
+   * @param user The uid to set
+   * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
+   */
+  async setUser(sessionId: string, user: string): Promise<void> {
+    try {
+      const session = await this.get(sessionId)
+
+      if (session === undefined) {
+        throw new Error('Session not found')
+      }
+
+      await this.client
+        .from('session')
+        .update({ user: user })
+        .match({ id: sessionId })
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
    * Get the playlist for the current session
    * @param sessionId 
    * @returns Promise<PlaylistType> The playlist that the current session uses
