@@ -25,7 +25,7 @@ export type SongCreateType = {
   title: string,
   platformId: string,
   addedBy: string,
-  playlistId: number,  
+  playlistId: number,
 }
 
 export type YoutubeSongCreateType = SongCreateType & {
@@ -85,12 +85,30 @@ export default class Song {
     }
   }
 
+  async alreadyContains(platformId: string, playlistId: number): Promise<boolean> {
+    const { data, error } = await this.client
+      .from('song')
+      .select()
+      .match({ platform_id: platformId, playlist: playlistId })
+
+    if (error !== null) {
+      return false
+    }
+
+    return data !== null
+  }
+
   /**
    * Create a youtube song in the database
    * @param song {@link YoutubeSongCreateType} The youtube song to create
-   * @throws {@link PostgrestError} If the song already exists
+   * @throws {@link PostgrestError} If some weird supabase error happens
+   * @throws {@link Error} If the song already exists
    */
   async createYoutube(song: YoutubeSongCreateType): Promise<void> {
+    if (await this.alreadyContains(song.platformId, song.playlistId)) {
+      throw new Error('Song already exists')
+    }
+
     const { error } = await this.client
       .from('song')
       .insert({
@@ -106,6 +124,38 @@ export default class Song {
         throw error
       }
   }
+
+  /**
+   * Create a spotify song in the database
+   * @param song {@link SpotifySongCreateType} The spotify song to create
+   * @throws {@link PostgrestError} If some weird supabase error happens
+   * @throws {@link Error} If the song already exists
+   */
+  async createSpotify(song: SpotifySongCreateType): Promise<void> {
+    if (await this.alreadyContains(song.platformId, song.playlistId)) {
+      throw new Error('Song already exists')
+    }
+
+    const { error } = await this.client
+      .from('song')
+      .insert({
+        play_count: 0,
+        added_by: song.addedBy,
+        song_type: SongEnum.SPOTIFY,
+        platform_id: song.platformId,
+        playlist: song.playlistId,
+        title: song.title,
+        artist: song.artist,
+        cover: song.cover,
+        length: song.length,
+        album: song.album
+      })
+
+      if (error !== null) {
+        throw error
+      }
+  }
+
 
   /**
    * Deletes a given song
