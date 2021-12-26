@@ -77,6 +77,22 @@ export default class Playlist {
   }
 
   /**
+   * Delete a playlist
+   * @param playlistId The playlist to delete 
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async delete(playlistId: number): Promise<void> {
+    const { error } = await this.client
+      .from('playlist')
+      .delete()
+      .match({ id: playlistId })
+
+    if (error !== null) {
+      throw error
+    }
+  }
+
+  /**
    * Get a playlist with all songs that are in this playlist
    * @param playlistId The playlist id to query
    * @returns {@link PlaylistWithSongsType} The playlist with all songs
