@@ -196,4 +196,42 @@ export default class Playlist {
     return data[0].users.includes(username)
   }
 
+  /**
+   * Gets an array of usernames that added to this playlist
+   * @param playlistId The playlist to get the users from
+   * @returns {@type Promise<string[]>} The array of usernames
+   * @throws {@type Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async getUsers(playlistId: number): Promise<string[]> {
+    const { data, error } = await this.client
+      .from('playlist')
+      .select()
+      .match({ id: playlistId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null) {
+      throw new Error('Playlist not found')
+    }
+
+    return data[0].users
+  }
+
+  /**
+   * Get the number of users from the given playlist.
+   * @param playlistId The playlist to get the number of users from
+   * @returns {@link Promise<number>} The number of users in the playlist
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async getNumberOfUsers(playlistId: number): Promise<number> {
+    try {
+      const users = await this.getUsers(playlistId)
+      return users.length
+    } catch (error) {
+      throw error
+    }
+  }
+
 }

@@ -110,6 +110,7 @@ export default class Session {
   async getCurrentlyPlaying(sessionId: string): Promise<SongType> {
     try {
       const session = await this.get(sessionId)
+      
       if (session === undefined) {
         throw new Error('Session not found')
       }
