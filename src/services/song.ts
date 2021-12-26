@@ -162,7 +162,7 @@ export default class Song {
    * @param songId The song to delete
    * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
    */
-  async delete(songId: string): Promise<void> {
+  async delete(songId: number): Promise<void> {
     const { error } = await this.client
       .from('song')
       .delete()
@@ -178,7 +178,7 @@ export default class Song {
    * @param playlistId 
    * @returns 
    */
-  async getAllFromPlaylist(playlistId: string): Promise<SongType[]> {
+  async getAllFromPlaylist(playlistId: number): Promise<SongType[]> {
     const { data, error } = await this.client
       .from('song')
       .select()
@@ -217,5 +217,47 @@ export default class Song {
     })
 
     return songs
+  }
+
+  /**
+   * Resets a song's play count to 0
+   * @param songId The songid to update
+   * @param playlistId The playlist id where the song is
+   * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
+   */
+  async resetSong(songId: number, playlistId: number): Promise<void> {
+    const { error } = await this.client
+      .from('song')
+      .update({
+        play_count: 0
+      })
+      .match({ id: songId, playlist: playlistId })
+
+    if (error !== null) {
+      throw error
+    }
+  }
+  
+  /**
+   * Get the current playCount for a song
+   * @param songId The song to query
+   * @returns number The playCount
+   * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
+   */
+  async getPlays(songId: number): Promise<number> {
+    const { data, error } = await this.client
+      .from('song')
+      .select()
+      .match({ id: songId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null) {
+      throw new Error('Song not found')
+    }
+
+    return data[0].play_count
   }
 }
