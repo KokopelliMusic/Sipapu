@@ -27,7 +27,7 @@ export default class Playlist {
    * @param playlistId 
    * @returns 
    */
-  async get(playlistId: string): Promise<PlaylistType> {
+  async get(playlistId: number): Promise<PlaylistType> {
     const { data, error } = await this.client
       .from('playlist')
       .select()
@@ -55,7 +55,7 @@ export default class Playlist {
    * @returns {@link PlaylistWithSongsType} The playlist with all songs
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async getWithSongs(playlistId: string): Promise<PlaylistWithSongsType> {
+  async getWithSongs(playlistId: number): Promise<PlaylistWithSongsType> {
     try {
       const playlist = await this.get(playlistId)
       const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
