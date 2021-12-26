@@ -31,6 +31,42 @@ export default class Song {
   }
 
   /**
+   * Get a song by its id
+   * @param songId The song id to query
+   * @returns {@link SongType} The song
+   * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
+   */
+  async get(songId: string): Promise<SongType> {
+    const { data, error } = await this.client
+      .from('song')
+      .select()
+      .match({ id: songId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null) {
+      throw new Error('Song not found')
+    }
+
+    return {
+      id: data[0].id,
+      createdAt: new Date(data[0].created_at),
+      playCount: data[0].play_count,
+      addedBy: data[0].added_by,
+      songType: data[0].song_type,
+      platformId: data[0].platform_id,
+      playlistId: data[0].playlist,
+      title: data[0].title,
+      artist: data[0].artist,
+      cover: data[0].cover,
+      length: data[0].length,
+      album: data[0].album
+    }
+  }
+
+  /**
    * Get all songs from a given playlist
    * @param playlistId 
    * @returns 
