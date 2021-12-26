@@ -7,6 +7,7 @@ export type PlaylistType = {
   createdAt: Date
   name: string
   user: string
+  users: string[]
 }
 
 export type PlaylistWithSongsType = PlaylistType & {
@@ -46,6 +47,7 @@ export default class Playlist {
       createdAt: new Date(data[0].created_at),
       name: data[0].name,
       user: data[0].user,
+      users: data[0].users,
     }
   }
 
@@ -107,6 +109,7 @@ export default class Playlist {
         createdAt: new Date(playlist.created_at),
         name: playlist.name,
         user: playlist.user,
+        users: playlist.users,
       })
     })
 
@@ -119,16 +122,50 @@ export default class Playlist {
    * @param playlistId The playlist to reset
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-     async resetPlaylist(playlistId: number): Promise<void> {
-      const { error } = await this.client
-        .from('song')
-        .update({
-          play_count: 0
-        })
-        .match({ playlist: playlistId })
-  
-      if (error !== null) {
-        throw error
-      }
+  async resetPlaylist(playlistId: number): Promise<void> {
+    const { error } = await this.client
+      .from('song')
+      .update({
+        play_count: 0
+      })
+      .match({ playlist: playlistId })
+
+    if (error !== null) {
+      throw error
     }
+  }
+
+  /**
+   * Adds an username to the list of people who added to this playlist
+   * @param playlistId The playlist to add the user to
+   * @param username The username to add
+   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
+   */
+  async addUser(playlistId: number, username: string): Promise<void> {
+    const { data, error } = await this.client
+      .from('playlist')
+      .select()
+      .match({ id: playlistId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null) {
+      throw new Error('Playlist not found')
+    }
+
+    const newUsers = data[0].users.append(username)
+
+    const res = await this.client
+      .from('playlist')
+      .update({
+        users: newUsers
+      })
+
+    if (res.error) {
+      throw res.error
+    }
+  }
+
 }
