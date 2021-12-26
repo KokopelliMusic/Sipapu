@@ -1,12 +1,14 @@
 import { SupabaseClient, SupabaseRealtimePayload } from '@supabase/supabase-js'
 import { ISipapu } from '..'
 import { PlaylistType } from './playlist'
+import { SongType } from './song'
 
 type SessionType = {
   id: string
   createdAt: Date
   user: string
   playlistId: number
+  currentlyPlaying: SongType
 }
 
 /**
@@ -42,6 +44,7 @@ export default class Session {
       createdAt: new Date(data[0].created_at),
       user: data[0].user,
       playlistId: data[0].playlist,
+      currentlyPlaying: data[0].currently_playing
     }
   }
   
@@ -71,7 +74,8 @@ export default class Session {
             id: payload.new.id,
             createdAt: new Date(payload.new.created_at),
             user: payload.new.user,
-            playlistId: payload.new.playlist
+            playlistId: payload.new.playlist,
+            currentlyPlaying: payload.new.currently_playing
           })
         }
       })
@@ -81,7 +85,8 @@ export default class Session {
   /**
    * Get the playlist for the current session
    * @param sessionId 
-   * @returns 
+   * @returns Promise<PlaylistType> The playlist that the current session uses
+   * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
    */
   async getPlaylist(sessionId: string): Promise<PlaylistType> {
     try {
@@ -96,4 +101,22 @@ export default class Session {
     }
   }
 
+  /**
+   * Get the currently playing song for the current session
+   * @param sessionId The id of the session to lookup
+   * @returns Promise<SongType> The song that is currently playing
+   * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
+   */
+  async getCurrentlyPlaying(sessionId: string): Promise<SongType> {
+    try {
+      const session = await this.get(sessionId)
+      if (session === undefined) {
+        throw new Error('Session not found')
+      }
+
+      return session.currentlyPlaying
+    } catch (error) {
+      throw error
+    }
+  }
 }
