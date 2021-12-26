@@ -105,6 +105,12 @@ export default class Song {
    * @throws {@link Error} If the song already exists
    */
   async createYoutube(song: YoutubeSongCreateType): Promise<void> {
+    try {
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
+    } catch (error) {
+      throw error
+    }
+
     if (await this.alreadyContains(song.platformId, song.playlistId)) {
       throw new Error('Song already exists')
     }
@@ -120,9 +126,9 @@ export default class Song {
         title: song.title,
       })
 
-      if (error !== null) {
-        throw error
-      }
+    if (error !== null) {
+      throw error
+    }
   }
 
   /**
@@ -132,6 +138,12 @@ export default class Song {
    * @throws {@link Error} If the song already exists
    */
   async createSpotify(song: SpotifySongCreateType): Promise<void> {
+    try {
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
+    } catch (error) {
+      throw error
+    }
+
     if (await this.alreadyContains(song.platformId, song.playlistId)) {
       throw new Error('Song already exists')
     }
