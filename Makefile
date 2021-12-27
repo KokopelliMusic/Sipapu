@@ -1,14 +1,14 @@
-build: lint && test
-	microbundle -o dist/ --sourcemap false --compress false
+build: lint
+	npx microbundle -o dist/ --sourcemap false --compress false
 
 dev: start
-	microbundle watch -o dist/ --sourcemap false --compress false
+	npx microbundle watch -o dist/ --sourcemap false --compress false
 
 test:
-	jest --coverage
+	npx jest --coverage
 
 lint:
-	eslint --fix --ext .js,.jsx,.ts,.tsx ./
+	npx eslint --fix --ext .js,.jsx,.ts,.tsx ./
 
 init:
 	npx supabase init

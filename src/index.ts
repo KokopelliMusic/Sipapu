@@ -19,7 +19,7 @@ export interface ISipapu {
  *  - Authenticate the client
  *  - Use the client to query data
  */
-export default class Sipapu implements ISipapu {
+export class Sipapu implements ISipapu {
   private client: SupabaseClient
   Session: Session
   Playlist: Playlist

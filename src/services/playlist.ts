@@ -1,6 +1,6 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { ISipapu } from "..";
-import { SongType } from "./song";
+import { SupabaseClient } from '@supabase/supabase-js'
+import { ISipapu } from '..'
+import { SongType } from './song'
 
 export type PlaylistType = {
   id: number

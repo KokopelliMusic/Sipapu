@@ -1,5 +1,5 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { ISipapu } from ".."
+import { SupabaseClient } from '@supabase/supabase-js'
+import { ISipapu } from '..'
 
 export enum SongEnum {
   SPOTIFY = 'spotify',
