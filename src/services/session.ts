@@ -1,5 +1,5 @@
 import { SupabaseClient, SupabaseRealtimePayload } from '@supabase/supabase-js'
-import { ISipapu } from '..'
+import { Sipapu } from '..'
 import { PlaylistType } from './playlist'
 import { SongType } from './song'
 
@@ -16,9 +16,9 @@ type SessionType = {
  */
 export default class Session {
   private client: SupabaseClient;
-  private sipapu: ISipapu;
+  private sipapu: Sipapu;
 
-  constructor(client: SupabaseClient, sipapu: ISipapu) {
+  constructor(client: SupabaseClient, sipapu: Sipapu) {
     this.client = client
     this.sipapu = sipapu
   }
@@ -35,14 +35,14 @@ export default class Session {
       .select()
       .match({ id: sessionId })
 
-    if (error === null || data === null) {
+    if (error === null || data === null || data.length === 0) {
       return undefined
     }
 
     return {
       id: sessionId,
       createdAt: new Date(data[0].created_at),
-      user: data[0].user,
+      user: data[0].user_id,
       playlistId: data[0].playlist,
       currentlyPlaying: data[0].currently_playing
     }
@@ -73,7 +73,7 @@ export default class Session {
           callback({
             id: payload.new.id,
             createdAt: new Date(payload.new.created_at),
-            user: payload.new.user,
+            user: payload.new.user_id,
             playlistId: payload.new.playlist,
             currentlyPlaying: payload.new.currently_playing
           })
@@ -98,7 +98,7 @@ export default class Session {
 
       await this.client
         .from('session')
-        .update({ user: user })
+        .update({ user_id: user })
         .match({ id: sessionId })
     } catch (error) {
       throw error
