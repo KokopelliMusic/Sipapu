@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ISipapu } from '..'
+import { Sipapu } from '..'
 
 export enum SongEnum {
   SPOTIFY = 'spotify',
@@ -42,9 +42,9 @@ export type SpotifySongCreateType = SongCreateType & {
 
 export default class Song {
   private client: SupabaseClient
-  private sipapu: ISipapu
+  private sipapu: Sipapu
   
-  constructor(client: SupabaseClient, sipapu: ISipapu) {
+  constructor(client: SupabaseClient, sipapu: Sipapu) {
     this.client = client
     this.sipapu = sipapu
   }
@@ -65,7 +65,7 @@ export default class Song {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Song not found')
     }
 
@@ -91,11 +91,15 @@ export default class Song {
       .select()
       .match({ platform_id: platformId, playlist: playlistId })
 
-    if (error !== null) {
+    if (error) {
+      return false
+    }
+    
+    if (data === null) {
       return false
     }
 
-    return data !== null
+    return data.length > 0
   }
 
   /**
@@ -111,9 +115,9 @@ export default class Song {
       throw error
     }
 
-    if (await this.alreadyContains(song.platformId, song.playlistId)) {
-      throw new Error('Song already exists')
-    }
+    const contains = await this.alreadyContains(song.platformId, song.playlistId)
+
+    if (contains) throw new Error('Song already exists')
 
     const { error } = await this.client
       .from('song')
@@ -266,7 +270,7 @@ export default class Song {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Song not found')
     }
 
