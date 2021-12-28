@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ISipapu } from '..'
+import { Sipapu } from '..'
 import { SongType } from './song'
 
 export type PlaylistType = {
@@ -17,29 +17,35 @@ export type PlaylistWithSongsType = PlaylistType & {
 export const MAX_PLAYS = 3
 
 export default class Playlist {
-  private client: SupabaseClient;
-  private sipapu: ISipapu;
+  private client: SupabaseClient
+  private sipapu: Sipapu
 
-  constructor(client: SupabaseClient, sipapu: ISipapu) {
+  constructor(client: SupabaseClient, sipapu: Sipapu) {
     this.client = client
     this.sipapu = sipapu
   }
 
   /**
-   * Creates a playlist for the given user with the given name
+   * Creates a playlist for the currently authenticated user with the given name
    * Initialized the users array with the current user
    * @param name The name of the playlist
-   * @param user The user to create the playlist for
-   * @param username The username of the user to create the playlist for
    * @returns {@link Promise<PlaylistType>} The created playlist
    * @throws {@link Error} If the user doesn't exist or the user doesn't have access to it
    */
-  async create(name: string, user: string, username: string): Promise<void> {
+  async create(name: string): Promise<void> {
+    const uid = this.client.auth.user()?.id
+
+    if (!uid) {
+      throw new Error('You are not logged in!')
+    }
+
+    const username = this.client.auth.user()?.user_metadata.username
+
     const { error } = await this.client
       .from('playlist')
       .insert({
         name,
-        user,
+        user_id: uid,
         users: [username]
       })
 
@@ -63,7 +69,7 @@ export default class Playlist {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Playlist not found')
     }
 
@@ -71,7 +77,7 @@ export default class Playlist {
       id: data[0].id,
       createdAt: new Date(data[0].created_at),
       name: data[0].name,
-      user: data[0].user,
+      user: data[0].user_id,
       users: data[0].users,
     }
   }
@@ -127,7 +133,7 @@ export default class Playlist {
     const { data, error }: { data: any[] | null, error: any } = await this.client
       .from('playlist')
       .select()
-      .match({ user: uid })
+      .match({ user_id: uid })
 
     if (error !== null) {
       throw error
@@ -149,7 +155,7 @@ export default class Playlist {
         id: playlist.id,
         createdAt: new Date(playlist.created_at),
         name: playlist.name,
-        user: playlist.user,
+        user: playlist.user_id,
         users: playlist.users,
       })
     })
@@ -196,16 +202,17 @@ export default class Playlist {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Playlist not found')
     }
 
-    const newUsers = data[0].users.append(username)
+    (<Array<string>> data[0].users).push(username)
+
 
     const res = await this.client
       .from('playlist')
       .update({
-        users: newUsers
+        users: data[0].users
       })
 
     if (res.error) {
@@ -230,7 +237,7 @@ export default class Playlist {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Playlist not found')
     }
 
@@ -253,7 +260,7 @@ export default class Playlist {
       throw error
     }
 
-    if (data === null) {
+    if (data === null || data.length === 0) {
       throw new Error('Playlist not found')
     }
 
