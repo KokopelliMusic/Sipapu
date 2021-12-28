@@ -88,3 +88,8 @@ coverage/
 
 # Supabase
 .supabase
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp
+**/supabase/.env
