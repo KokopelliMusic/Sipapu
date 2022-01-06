@@ -2,4 +2,5 @@
 export type Settings = {
   supabaseUrl: string
   supabaseKey: string
+  tawaUrl: string
 }
