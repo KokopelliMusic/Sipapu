@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient, SupabaseClientOptions, User } from '@supabase/supabase-js'
+import { createClient, SupabaseClient, SupabaseClientOptions } from '@supabase/supabase-js'
 import Playlist from './services/playlist'
 import Session from './services/session'
 import Song from './services/song'
@@ -13,21 +13,20 @@ export class Sipapu {
   Session: Session
   Playlist: Playlist
   Song: Song
+  clientType: string
 
   /**
    * Constructor for the Sipapu client
    */
-  constructor() {
+  constructor(clientType: string) {
 
     const options: SupabaseClientOptions = {
-      headers: {
-        // ja ik ook leesbare code schrijven 
-        // apiKey: apiKey ?? (token ?? '')
-      },
+      headers: {},
       autoRefreshToken: true,
       persistSession: true
     }
 
+    this.clientType = clientType
     this.client = createClient(settings.supabaseUrl, settings.supabaseKey, options)
     this.Session = new Session(this.client, this)
     this.Playlist = new Playlist(this.client, this)
