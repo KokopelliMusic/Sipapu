@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
+import { EventTypes } from '../events'
 
 export enum SongEnum {
   SPOTIFY = 'spotify',
@@ -85,6 +86,9 @@ export default class Song {
     }
   }
 
+  /**
+   * Check if a song exists in a playlist
+   */
   async alreadyContains(platformId: string, playlistId: number): Promise<boolean> {
     const { data, error } = await this.client
       .from('song')
@@ -105,12 +109,13 @@ export default class Song {
   /**
    * Create a youtube song in the database
    * @param song {@link YoutubeSongCreateType} The youtube song to create
+   * @param sessionId The current session of the user, this is used to notify other clients
    * @throws {@link PostgrestError} If some weird supabase error happens
    * @throws {@link Error} If the song already exists
    */
-  async createYoutube(song: YoutubeSongCreateType): Promise<void> {
+  async createYoutube(song: YoutubeSongCreateType, sessionId: string): Promise<void> {
     try {
-      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy, sessionId)
     } catch (error) {
       throw error
     }
@@ -133,6 +138,8 @@ export default class Song {
     if (error !== null) {
       throw error
     }
+
+    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.YOUTUBE_SONG_ADDED, { error: false, song })
   }
 
   /**
@@ -141,9 +148,9 @@ export default class Song {
    * @throws {@link PostgrestError} If some weird supabase error happens
    * @throws {@link Error} If the song already exists
    */
-  async createSpotify(song: SpotifySongCreateType): Promise<void> {
+  async createSpotify(song: SpotifySongCreateType, sessionId: string): Promise<void> {
     try {
-      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy, sessionId)
     } catch (error) {
       throw error
     }
@@ -167,9 +174,11 @@ export default class Song {
         album: song.album
       })
 
-      if (error !== null) {
-        throw error
-      }
+    if (error !== null) {
+      throw error
+    }
+
+    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SPOTIFY_SONG_ADDED, { error: false, song })
   }
 
 
@@ -178,7 +187,7 @@ export default class Song {
    * @param songId The song to delete
    * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
    */
-  async delete(songId: number): Promise<void> {
+  async delete(songId: number, sessionId: string): Promise<void> {
     const { error } = await this.client
       .from('song')
       .delete()
@@ -187,6 +196,8 @@ export default class Song {
     if (error !== null) {
       throw error
     }
+
+    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SONG_REMOVED, { error: false, songId })
   }
 
   /**
@@ -284,20 +295,10 @@ export default class Song {
    * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
    */
   async incrmentPlayCount(songId: number): Promise<void> {
-    try {
-      const song = await this.get(songId)
+    const { error } = await this.client
+      .rpc('increment_play_count', { song_id: songId })
 
-      const { error } = await this.client
-      .from('song')
-      .update({
-        play_count: song.playCount + 1
-      })
-      .match({ id: songId })
-
-      if (error !== null) {
-        throw error
-      }
-    } catch (error) {
+    if (error !== null) {
       throw error
     }
   }
