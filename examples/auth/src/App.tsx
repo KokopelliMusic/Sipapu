@@ -1,5 +1,4 @@
 import './App.css';
-import { Sipapu } from 'sipapu'
 
 function App() {
 
