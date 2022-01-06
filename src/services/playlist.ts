@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
+import { EventTypes } from '../events'
+import { EMPTY_EVENT_DATA } from './session'
 import { SongType } from './song'
 
 export type PlaylistType = {
@@ -165,11 +167,11 @@ export default class Playlist {
   }
 
   /**
-   * Resets an entire playlists play count to 0
+   * Resets an entire playlists play count to 0. This also generates a PLAYLIST_FINISHED event, since this method is always called when a playlist is finished.
    * @param playlistId The playlist to reset
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async resetPlaylist(playlistId: number): Promise<void> {
+  async resetPlaylist(playlistId: number, sessionId: string): Promise<void> {
     const { error } = await this.client
       .from('song')
       .update({
@@ -180,44 +182,29 @@ export default class Playlist {
     if (error !== null) {
       throw error
     }
+
+    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
   }
 
   /**
    * Adds an username to the list of people who added to this playlist
    * @param playlistId The playlist to add the user to
-   * @param username The username to add
+   * @param userId The user to add to the playlist
+   * @param sessionId The session id to use for the event
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async addUser(playlistId: number, username: string): Promise<void> {
-    if (await this.hasUsername(playlistId, username)) {
-      return
-    }
-
-    const { data, error } = await this.client
-      .from('playlist')
-      .select()
-      .match({ id: playlistId })
+  async addUser(playlistId: number, userId: string, sessionId: string): Promise<void> {
+    const { error } = await this.client
+      .rpc('add_user_to_playlist', {
+        playlist_id: playlistId,
+        uid: userId
+      })
 
     if (error !== null) {
       throw error
     }
 
-    if (data === null || data.length === 0) {
-      throw new Error('Playlist not found')
-    }
-
-    (<Array<string>> data[0].users).push(username)
-
-
-    const res = await this.client
-      .from('playlist')
-      .update({
-        users: data[0].users
-      })
-
-    if (res.error) {
-      throw res.error
-    }
+    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
   }
 
   /**
