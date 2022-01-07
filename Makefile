@@ -15,3 +15,9 @@ init:
 
 start:
 	npx supabase start
+
+remove-dist:
+	npx rimraf dist
+
+publish: remove-dist build
+	npm publish
