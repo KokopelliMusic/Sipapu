@@ -1,11 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
-import { settings } from '../settings'
 import { PlaylistType } from './playlist'
 import { SongType } from './song'
 import { EventTypes, Event, parseEvent, EventData } from '../events'
 
-type SessionType = {
+export type SessionType = {
   id: string
   createdAt: Date
   user: string
@@ -42,7 +41,7 @@ export default class Session {
    * @param data The data to send with the event
    */
   async notifyEvent(sessionId: string, eventType: EventTypes, eventData: EventData | unknown): Promise<void> {
-    return await fetch(`${settings.tawaUrl}/input/${sessionId}`, {
+    return await fetch(`${this.sipapu.tawaUrl}/input/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -86,7 +85,7 @@ export default class Session {
    * @param playlistId The id of the playlist to use
    * @throws {@link Error} If the new session doesn't exist
    */
-  async claim(playlistId: string, sessionId: string): Promise<void> {
+  async claim(playlistId: number, sessionId: string): Promise<void> {
     const { error } = await this.client
       .rpc('claim_session', { session_id: sessionId, user_id: this.client.auth.user()?.id, playlist_id: playlistId })
 
@@ -156,7 +155,7 @@ export default class Session {
       sessionId = this.sessionId
     }
 
-    const url = `${settings.tawaUrl}/stream/session/${sessionId}`
+    const url = `${this.sipapu.tawaUrl}/stream/session/${sessionId}`
     const stream = new EventSource(url)
     stream.addEventListener('message', msg => {
       console.log('[SIPAPU] New event:', msg)

@@ -3,7 +3,6 @@ import Playlist from './services/playlist'
 import Session from './services/session'
 import Song from './services/song'
 import Spotify from './services/spotify'
-import { settings } from './settings'
 
 /**
  * A Sipapu client.
@@ -16,11 +15,12 @@ export class Sipapu {
   Song: Song
   Spotify: Spotify
   clientType: string
+  tawaUrl: string
 
   /**
    * Constructor for the Sipapu client
    */
-  constructor(clientType: string) {
+  constructor(clientType: string, supabaseUrl: string, supabaseKey: string, tawaUrl: string) {
 
     const options: SupabaseClientOptions = {
       headers: {},
@@ -29,11 +29,12 @@ export class Sipapu {
     }
 
     this.clientType = clientType
-    this.client = createClient(settings.supabaseUrl, settings.supabaseKey, options)
+    this.client = createClient(supabaseUrl, supabaseKey, options)
     this.Session = new Session(this.client, this)
     this.Playlist = new Playlist(this.client, this)
     this.Song = new Song(this.client, this)
     this.Spotify = new Spotify(this.client, this)
+    this.tawaUrl = tawaUrl
   }
 
   isLoggedIn(): boolean {
@@ -106,6 +107,14 @@ export class Sipapu {
 
   static getTokenFromLocalStorage(): string | null {
     return localStorage.getItem('sipapu:access_token')
+  }
+
+  /**
+   * Returns the UID for the current user
+   * @returns string | undefined The UID for the current user. Is undefined if not logged in
+   */
+  getUID(): string | undefined {
+    return this.client.auth.user()?.id
   }
 
   /**
