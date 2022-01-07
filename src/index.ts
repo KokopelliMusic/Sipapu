@@ -2,6 +2,7 @@ import { createClient, SupabaseClient, SupabaseClientOptions } from '@supabase/s
 import Playlist from './services/playlist'
 import Session from './services/session'
 import Song from './services/song'
+import Spotify from './services/spotify'
 import { settings } from './settings'
 
 /**
@@ -13,6 +14,7 @@ export class Sipapu {
   Session: Session
   Playlist: Playlist
   Song: Song
+  Spotify: Spotify
   clientType: string
 
   /**
@@ -31,6 +33,7 @@ export class Sipapu {
     this.Session = new Session(this.client, this)
     this.Playlist = new Playlist(this.client, this)
     this.Song = new Song(this.client, this)
+    this.Spotify = new Spotify(this.client, this)
   }
 
   isLoggedIn(): boolean {
