@@ -31,49 +31,49 @@ export type EventData = {
   error: false
 }
 
-type GenericEventData = EventData & unknown
+export type GenericEventData = EventData & unknown
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SessionCreatedEventData = EventData & {}
+export type SessionCreatedEventData = EventData & {}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SessionRemovedEventData = EventData & {}
+export type SessionRemovedEventData = EventData & {}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SkipSongEventData = EventData & {}
+export type SkipSongEventData = EventData & {}
 
-type PlaySongEventData = EventData & { song: SongType }
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-type PreviousSongEventData = EventData & {}
+export type PlaySongEventData = EventData & { song: SongType }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type ResumePlaybackEventData = EventData & {}
+export type PreviousSongEventData = EventData & {}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type PausePlaybackEventData = EventData & {}
-
-type YoutubeSongAddedEventData = EventData & { song: YoutubeSongCreateType }
-
-type SpotifySongAddedEventData = EventData & { song: SpotifySongCreateType }
-
-type SongDeletedEventData = EventData & { songId: number }
-
-type NewUserEventData = EventData & { user: string }
+export type ResumePlaybackEventData = EventData & {}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SongFinishedEventData = EventData & {}
+export type PausePlaybackEventData = EventData & {}
 
-type NextSongEventData = EventData & { song: SongType }
+export type YoutubeSongAddedEventData = EventData & { song: YoutubeSongCreateType }
+
+export type SpotifySongAddedEventData = EventData & { song: SpotifySongCreateType }
+
+export type SongDeletedEventData = EventData & { songId: number }
+
+export type NewUserEventData = EventData & { user: string }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type PlaylistFinishedEventData = EventData & {}
+export type SongFinishedEventData = EventData & {}
 
-type SpotifyErrorEventData = EventData & { error: true, message: unknown }
+export type NextSongEventData = EventData & { song: SongType }
 
-type YoutubeErrorEventData = EventData & { error: true, message: unknown }
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type PlaylistFinishedEventData = EventData & {}
 
-type PlaylistTooSmallError = EventData & { error: true, message: string }
+export type SpotifyErrorEventData = EventData & { error: true, message: unknown }
+
+export type YoutubeErrorEventData = EventData & { error: true, message: unknown }
+
+export type PlaylistTooSmallError = EventData & { error: true, message: string }
 
 export type Event = {
   session: string
