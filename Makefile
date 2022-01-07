@@ -1,5 +1,5 @@
 build: lint
-	npx microbundle -o dist/ --sourcemap false --compress false
+	npx microbundle -o dist/ --sourcemap false --compress false --generateTypes true 
 
 dev: start
 	npx microbundle watch -o dist/ --sourcemap false --compress false
@@ -19,5 +19,8 @@ start:
 remove-dist:
 	npx rimraf dist
 
-publish: remove-dist build
+next-small-version:
+	npm version patch
+
+publish: remove-dist build next-small-version
 	npm publish

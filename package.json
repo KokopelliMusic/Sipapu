@@ -4,6 +4,7 @@
   "description": "Sipapu: A library for the Kokopelli app and webplayer",
   "main": "dist/sipapu.js",
   "umd:main": "dist/sipapu.umd.js",
+  "module": "dist/sipapu.module.js",
   "types": "dist/sipapu.d.ts",
   "files": [
     "dist",
