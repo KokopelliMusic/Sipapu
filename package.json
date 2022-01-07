@@ -1,10 +1,10 @@
 {
   "name": "sipapu",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Sipapu: A library for the Kokopelli app and webplayer",
-  "main": "dist/Sipapu.js",
-  "umd:main": "dist/Sipapu.umd.js",
-  "module": "dist/Sipapu.mjs",
+  "main": "dist/sipapu.js",
+  "umd:main": "dist/sipapu.umd.js",
+  "types": "dist/sipapu.d.ts", 
   "files": [
     "dist",
     "readme.md"
