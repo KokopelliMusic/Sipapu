@@ -15,11 +15,12 @@ export type SongType = {
   songType: SongEnum,
   platformId: string,
   playlistId: number,
+  queryResult: unknown,
   title: string,
   artist?: string,
   cover?: string,
   length?: number,
-  album?: string
+  album?: string,
 }
 
 export type SongCreateType = {
@@ -27,10 +28,11 @@ export type SongCreateType = {
   platformId: string,
   addedBy: string,
   playlistId: number,
+  queryResult: unknown,
 }
 
 export type YoutubeSongCreateType = SongCreateType & {
-  songType: SongEnum.YOUTUBE
+  songType: SongEnum.YOUTUBE,
 }
 
 export type SpotifySongCreateType = SongCreateType & {
@@ -38,7 +40,7 @@ export type SpotifySongCreateType = SongCreateType & {
   artist: string,
   cover: string,
   length: number,
-  album: string
+  album: string,
 }
 
 export default class Song {
@@ -82,7 +84,8 @@ export default class Song {
       artist: data[0].artist,
       cover: data[0].cover,
       length: data[0].length,
-      album: data[0].album
+      album: data[0].album,
+      queryResult: data[0].query_result,
     }
   }
 
@@ -109,13 +112,12 @@ export default class Song {
   /**
    * Create a youtube song in the database
    * @param song {@link YoutubeSongCreateType} The youtube song to create
-   * @param sessionId The current session of the user, this is used to notify other clients
    * @throws {@link PostgrestError} If some weird supabase error happens
    * @throws {@link Error} If the song already exists
    */
-  async createYoutube(song: YoutubeSongCreateType, sessionId: string): Promise<void> {
+  async createYoutube(song: YoutubeSongCreateType): Promise<void> {
     try {
-      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy, sessionId)
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
     } catch (error) {
       throw error
     }
@@ -133,13 +135,17 @@ export default class Song {
         platform_id: song.platformId,
         playlist: song.playlistId,
         title: song.title,
+        query_result: song.queryResult,
       })
 
     if (error !== null) {
       throw error
     }
 
-    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.YOUTUBE_SONG_ADDED, { error: false, song })
+    if (!this.sipapu.Session.sessionId) {
+      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    }
+    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.YOUTUBE_SONG_ADDED, { error: false, song })
   }
 
   /**
@@ -148,9 +154,9 @@ export default class Song {
    * @throws {@link PostgrestError} If some weird supabase error happens
    * @throws {@link Error} If the song already exists
    */
-  async createSpotify(song: SpotifySongCreateType, sessionId: string): Promise<void> {
+  async createSpotify(song: SpotifySongCreateType): Promise<void> {
     try {
-      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy, sessionId)
+      await this.sipapu.Playlist.addUser(song.playlistId, song.addedBy)
     } catch (error) {
       throw error
     }
@@ -171,14 +177,18 @@ export default class Song {
         artist: song.artist,
         cover: song.cover,
         length: song.length,
-        album: song.album
+        album: song.album,
+        query_result: song.queryResult,
       })
 
     if (error !== null) {
       throw error
     }
 
-    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SPOTIFY_SONG_ADDED, { error: false, song })
+    if (!this.sipapu.Session.sessionId) {
+      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    }
+    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SPOTIFY_SONG_ADDED, { error: false, song })
   }
 
 
@@ -187,7 +197,7 @@ export default class Song {
    * @param songId The song to delete
    * @throws {@link Error} If the song doesn't exist or the user doesn't have access to it
    */
-  async delete(songId: number, sessionId: string): Promise<void> {
+  async delete(songId: number): Promise<void> {
     const { error } = await this.client
       .from('song')
       .delete()
@@ -197,7 +207,10 @@ export default class Song {
       throw error
     }
 
-    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SONG_REMOVED, { error: false, songId })
+    if (!this.sipapu.Session.sessionId) {
+      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    }
+    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SONG_REMOVED, { error: false, songId })
   }
 
   /**
@@ -239,7 +252,8 @@ export default class Song {
         artist: song.artist,
         cover: song.cover,
         length: song.length,
-        album: song.album
+        album: song.album,
+        queryResult: song.query_result,
       })
     })
 

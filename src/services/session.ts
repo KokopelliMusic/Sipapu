@@ -21,10 +21,18 @@ export const EMPTY_EVENT_DATA: EventData = { error: false }
 export default class Session {
   private client: SupabaseClient;
   private sipapu: Sipapu;
+  sessionId: string | undefined
 
   constructor(client: SupabaseClient, sipapu: Sipapu) {
     this.client = client
     this.sipapu = sipapu
+  }
+
+  /**
+   * Sets the current session id, this value is always used in methods, even if you pass a session id to the method
+   */
+  setSessionId(sessionId: string): void {
+    this.sessionId = sessionId
   }
 
   /**
@@ -78,13 +86,15 @@ export default class Session {
    * @param playlistId The id of the playlist to use
    * @throws {@link Error} If the new session doesn't exist
    */
-  async claim(sessionId: string, playlistId: string): Promise<void> {
+  async claim(playlistId: string, sessionId: string): Promise<void> {
     const { error } = await this.client
       .rpc('claim_session', { session_id: sessionId, user_id: this.client.auth.user()?.id, playlist_id: playlistId })
 
     if (error !== null) {
       throw error
     }
+    
+    this.sessionId = sessionId
   }
 
   /**
@@ -94,6 +104,7 @@ export default class Session {
    * @returns Promise<SessionType | undefined> The session that was found, or undefined if none was found
    */
   async get(sessionId: string): Promise<SessionType | undefined> {
+
     const { data, error } = await this.client
       .from('session')
       .select()
@@ -134,11 +145,17 @@ export default class Session {
    * Watch the event stream for changes to the current session
    * These events can be any type of event, all from the EventTypes enum
    * All types are specified in {@link events.ts}
-   * @param sessionId The id of the session to watch
+   * If this.sessionId is set, then this function uses that value
+   * @param sessionId The id of the session to watch, if the
    * @param callback The function to call when an event is received, it passes the event in the correct type
    * 
    */
   async watch(sessionId: string, callback: (event: Event) => unknown): Promise<void> {
+
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+
     const url = `${settings.tawaUrl}/stream/session/${sessionId}`
     const stream = new EventSource(url)
     stream.addEventListener('message', msg => {
@@ -151,11 +168,16 @@ export default class Session {
 
   /**
    * Set the user for the given session
+   * If this.sessionId is set, then this function uses that value
    * @param sessionId The session to set the user for
    * @param user The uid to set
    * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
    */
-  async setUser(sessionId: string, user: string): Promise<void> {
+  async setUser(user: string, sessionId: string): Promise<void> {
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+
     try {
       const session = await this.get(sessionId)
 
@@ -174,11 +196,16 @@ export default class Session {
 
   /**
    * Get the playlist for the current session
+   * If this.sessionId is set, then this function uses that value
    * @param sessionId 
    * @returns Promise<PlaylistType> The playlist that the current session uses
    * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
    */
   async getPlaylist(sessionId: string): Promise<PlaylistType> {
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+
     try {
       const session = await this.get(sessionId)
       if (session === undefined) {
@@ -193,11 +220,16 @@ export default class Session {
 
   /**
    * Get the currently playing song for the current session
+   * If this.sessionId is set, then this function uses that value
    * @param sessionId The id of the session to lookup
    * @returns Promise<SongType> The song that is currently playing
    * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
    */
   async getCurrentlyPlaying(sessionId: string): Promise<SongType> {
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+
     try {
       const session = await this.get(sessionId)
       

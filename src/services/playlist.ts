@@ -171,7 +171,7 @@ export default class Playlist {
    * @param playlistId The playlist to reset
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async resetPlaylist(playlistId: number, sessionId: string): Promise<void> {
+  async resetPlaylist(playlistId: number): Promise<void> {
     const { error } = await this.client
       .from('song')
       .update({
@@ -183,17 +183,19 @@ export default class Playlist {
       throw error
     }
 
-    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
+    if (!this.sipapu.Session.sessionId) {
+      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    }
+    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
   }
 
   /**
    * Adds an username to the list of people who added to this playlist
    * @param playlistId The playlist to add the user to
    * @param userId The user to add to the playlist
-   * @param sessionId The session id to use for the event
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async addUser(playlistId: number, userId: string, sessionId: string): Promise<void> {
+  async addUser(playlistId: number, userId: string): Promise<void> {
     const { error } = await this.client
       .rpc('add_user_to_playlist', {
         playlist_id: playlistId,
@@ -204,7 +206,10 @@ export default class Playlist {
       throw error
     }
 
-    await this.sipapu.Session.notifyEvent(sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
+    if (!this.sipapu.Session.sessionId) {
+      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    }
+    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
   }
 
   /**
