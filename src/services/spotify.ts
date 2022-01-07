@@ -5,14 +5,12 @@ export type SpotifyType = {
   id: number,
   createdAt: Date,
   userId: string,
-  sessionId: string,
   accessToken: string,
   refreshToken: string,
   expiresAt: Date,
 }
 
 export type SpotifyCreateType = {
-  sessionId: string,
   accessToken: string,
   refreshToken: string,
   expiresAt: Date,
@@ -45,7 +43,6 @@ export default class Spotify {
       .from('spotify')
       .insert({
         user_id: uid,
-        session_id: spotify.sessionId,
         access_token: spotify.accessToken,
         refresh_token: spotify.refreshToken,
         expires_at: spotify.expiresAt,
@@ -84,7 +81,6 @@ export default class Spotify {
       id: data[0].id,
       createdAt: new Date(data[0].created_at),
       userId: data[0].user_id,
-      sessionId: data[0].session_id,
       accessToken: data[0].access_token,
       refreshToken: data[0].refresh_token,
       expiresAt: new Date(data[0].expires_at),
