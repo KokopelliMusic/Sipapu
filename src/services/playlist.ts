@@ -107,15 +107,14 @@ export default class Playlist {
    * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
    */
   async getWithSongs(playlistId: number): Promise<PlaylistWithSongsType> {
-    try {
-      const playlist = await this.get(playlistId)
-      const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
-      return {
-        ...playlist,
-        songs,
-      }
-    } catch (error) {
-      throw error
+    const playlist = await this.get(playlistId)
+      .catch(error => { throw error })
+    const songs = await this.sipapu.Song.getAllFromPlaylist(playlistId)
+      .catch(error => { throw error })
+
+    return {
+      ...playlist,
+      songs,
     }
   }
 
