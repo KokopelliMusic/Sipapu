@@ -48,7 +48,7 @@ export default class Playlist {
       .insert({
         name,
         user_id: uid,
-        users: [username]
+        users: [uid]
       })
 
     if (error !== null) {
@@ -213,50 +213,27 @@ export default class Playlist {
   }
 
   /**
-   * Checks if the username already is in the list of users
-   * @param playlistId The playlist to check
-   * @param username The username to check
-   * @returns boolean If the user is in the list of users
-   * @throws {@link Error} If the playlist doesn't exist or the user doesn't have access to it
-   */
-  async hasUsername(playlistId: number, username: string): Promise<boolean> {
-    const { data, error } = await this.client
-      .from('playlist')
-      .select()
-      .match({ id: playlistId })
-
-    if (error !== null) {
-      throw error
-    }
-
-    if (data === null || data.length === 0) {
-      throw new Error('Playlist not found')
-    }
-
-    return data[0].users.includes(username)
-  }
-
-  /**
    * Gets an array of usernames that added to this playlist
    * @param playlistId The playlist to get the users from
    * @returns {@type Promise<string[]>} The array of usernames
    * @throws {@type Error} If the playlist doesn't exist or the user doesn't have access to it
    */
   async getUsers(playlistId: number): Promise<string[]> {
-    const { data, error } = await this.client
-      .from('playlist')
-      .select()
-      .match({ id: playlistId })
+    throw new Error('Not implemented, still need to add a Profiles table that holds the usernames and profile pictures for users')
+    // const { data, error } = await this.client
+    //   .from('playlist')
+    //   .select()
+    //   .match({ id: playlistId })
 
-    if (error !== null) {
-      throw error
-    }
+    // if (error !== null) {
+    //   throw error
+    // }
 
-    if (data === null || data.length === 0) {
-      throw new Error('Playlist not found')
-    }
+    // if (data === null || data.length === 0) {
+    //   throw new Error('Playlist not found')
+    // }
 
-    return data[0].users
+    // return data[0].users
   }
 
   /**
