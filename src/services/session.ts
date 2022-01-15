@@ -50,7 +50,7 @@ export default class Session {
         session: sessionId,
         clientType: this.sipapu.clientType,
         eventType,
-        data: eventData
+        data: JSON.stringify(eventData)
       })
     })
     .then(res => res.json())
