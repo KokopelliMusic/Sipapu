@@ -1,5 +1,5 @@
 build: lint
-	npx microbundle -o dist/ --sourcemap false --compress false --generateTypes true 
+	tsc
 
 dev: start
 	npx microbundle watch -o dist/ --sourcemap false --compress false
