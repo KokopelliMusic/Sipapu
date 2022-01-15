@@ -49,7 +49,7 @@ export default class Playlist {
         name,
         user_id: uid,
         users: [uid]
-      })
+      }, { returning: 'minimal' })
 
     if (error !== null) {
       throw error
