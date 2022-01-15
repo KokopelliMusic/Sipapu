@@ -97,6 +97,35 @@ export default class Session {
   }
 
   /**
+   * Join a session. This will add the current authenticated users to the users array of the current playlist.
+   * @param sessionId The id of the session to join
+   * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
+   * @throws {@link Error} If the current user does not exist or some other authentication error
+   */
+  async join(sessionId: string): Promise<void> {
+    const user = this.client.auth.user()?.id
+
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    const session = await this.get(sessionId)
+      .catch(error => { throw error })
+
+    // We can disable the non null assesion here since that method throws an error if it is null so this code is never reached
+    const { error } = await this.client
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .rpc('add_user_to_playlist', { playlist_id: session!.playlistId, user_id: user })
+
+    if (error !== null) {
+      throw error
+    }
+
+    await this.notifyEvent(sessionId, EventTypes.NEW_USER, { ...EMPTY_EVENT_DATA, user })
+  }
+
+
+  /**
    * Gets a session by its id.
    * Returns undefined if either the session doesn't exist or the user doesn't have access to it.
    * @param sessionId The id to lookup
