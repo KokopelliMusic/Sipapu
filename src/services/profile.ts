@@ -55,10 +55,10 @@ export default class Profile {
     const { error } = await this.client
       .from('profile')
       .insert({
-        ...profile,
-        id: this.client.auth.user()?.id,
-        createdAt: new Date()
-      })
+        profile_picture: profile.profilePicture,
+        username: profile.username,
+        id: profile.id
+      }, { returning: 'minimal' })
 
     if (error) {
       throw error
