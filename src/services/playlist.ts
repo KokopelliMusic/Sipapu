@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
 import { EventTypes } from '../events'
+import { ProfileType } from './profile'
 import { EMPTY_EVENT_DATA } from './session'
 import { SongType } from './song'
 
@@ -40,8 +41,6 @@ export default class Playlist {
     if (!uid) {
       throw new Error('You are not logged in!')
     }
-
-    const username = this.client.auth.user()?.user_metadata.username
 
     const { error } = await this.client
       .from('playlist')
@@ -208,31 +207,39 @@ export default class Playlist {
     if (!this.sipapu.Session.sessionId) {
       throw new Error('SessionID not set in sipapu.Session.sessionId')
     }
+
     await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
   }
 
   /**
    * Gets an array of usernames that added to this playlist
    * @param playlistId The playlist to get the users from
-   * @returns {@type Promise<string[]>} The array of usernames
+   * @returns {@type Promise<ProfileType[]>} The array of profiles
    * @throws {@type Error} If the playlist doesn't exist or the user doesn't have access to it
    */
-  async getUsers(playlistId: number): Promise<string[]> {
-    throw new Error('Not implemented, still need to add a Profiles table that holds the usernames and profile pictures for users')
-    // const { data, error } = await this.client
-    //   .from('playlist')
-    //   .select()
-    //   .match({ id: playlistId })
+  async getUsers(playlistId: number): Promise<ProfileType[]> {
+    const { data, error } = await this.client
+      .from('playlist')
+      .select()
+      .match({ id: playlistId })
 
-    // if (error !== null) {
-    //   throw error
-    // }
+    if (error !== null) {
+      throw error
+    }
 
-    // if (data === null || data.length === 0) {
-    //   throw new Error('Playlist not found')
-    // }
+    if (data === null || data.length === 0) {
+      throw new Error('Playlist not found')
+    }
 
-    // return data[0].users
+    const users: ProfileType[] = []
+
+    data[0].users.forEach((user: string) => {
+      this.sipapu.Profile.get(user)
+        .then(u => users.push(u))
+        .catch(error => { throw error })
+    })
+
+    return users
   }
 
   /**
