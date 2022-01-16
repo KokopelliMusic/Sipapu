@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient, SupabaseClientOptions } from '@supabase/supabase-js'
 import Playlist from './services/playlist'
+import Profile from './services/profile'
 import Session from './services/session'
 import Song from './services/song'
 import Spotify from './services/spotify'
@@ -14,6 +15,7 @@ export class Sipapu {
   Playlist: Playlist
   Song: Song
   Spotify: Spotify
+  Profile: Profile
   clientType: string
   tawaUrl: string
 
@@ -34,6 +36,7 @@ export class Sipapu {
     this.Playlist = new Playlist(this.client, this)
     this.Song = new Song(this.client, this)
     this.Spotify = new Spotify(this.client, this)
+    this.Profile = new Profile(this.client, this)
     this.tawaUrl = tawaUrl
   }
 
