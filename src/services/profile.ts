@@ -10,6 +10,12 @@ export type ProfileType = {
   profilePicture: string | undefined
 }
 
+type ProfileCreateType = {
+  id: string
+  username: string
+  profilePicture: string | undefined
+}
+
 export default class Profile {
   private client: SupabaseClient
   private sipapu: Sipapu
@@ -39,6 +45,24 @@ export default class Profile {
     }
 
     return data[0]
+  }
+
+  /**
+   * Create a new profile for the current user
+   * @param profile 
+   */
+  async create(profile: ProfileCreateType): Promise<void> {
+    const { error } = await this.client
+      .from('profile')
+      .insert({
+        ...profile,
+        id: this.client.auth.user()?.id,
+        createdAt: new Date()
+      })
+
+    if (error) {
+      throw error
+    }
   }
 
   /**

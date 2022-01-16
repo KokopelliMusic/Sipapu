@@ -77,6 +77,9 @@ export class Sipapu {
       throw new Error('According to the documentation this should never happen, but in the case it does: User obj is null in the supabase.auth.signUp() method')
     }
 
+    // Now the user exists, we can create a new profile
+    this.Profile.create({ username, id: user.id, profilePicture: undefined })
+
     this.client.auth.setAuth(session.access_token)
     localStorage.setItem('sipapu:access_token', session.access_token)
   }
@@ -119,35 +122,7 @@ export class Sipapu {
   getUID(): string | undefined {
     return this.client.auth.user()?.id
   }
-
-  /**
-   * Changes the username for the current user
-   * @param username The username to change into
-   * @throws {@link Error} If supabase screws up
-   */
-  async changeUsername(username: string): Promise<void> {
-    const { error } = await this.client.auth.update({ data: { username } })
-
-    if (error) {
-      throw error
-    }
-  }
-
-  /**
-   * Fetches the current user's username
-   * @throws {@link Error} If the user is not authenticated or found of smth else went wrong
-   * @returns {Promise<string>} The current user's username
-   */
-  async getUsername(): Promise<string> {
-    const user = await this.client.auth.user()
-
-    if (user === null) {
-      throw new Error('User not found')
-    }
-
-    return user.user_metadata.username 
-  }
-
+  
   /**
    * Signs out the current user
    */
