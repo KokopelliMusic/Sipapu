@@ -142,10 +142,9 @@ export default class Song {
       throw error
     }
 
-    if (!this.sipapu.Session.sessionId) {
-      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.YOUTUBE_SONG_ADDED, { error: false, song })
     }
-    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.YOUTUBE_SONG_ADDED, { error: false, song })
   }
 
   /**
@@ -185,10 +184,9 @@ export default class Song {
       throw error
     }
 
-    if (!this.sipapu.Session.sessionId) {
-      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SPOTIFY_SONG_ADDED, { error: false, song })
     }
-    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SPOTIFY_SONG_ADDED, { error: false, song })
   }
 
 
