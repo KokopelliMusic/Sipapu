@@ -181,10 +181,9 @@ export default class Playlist {
       throw error
     }
 
-    if (!this.sipapu.Session.sessionId) {
-      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
     }
-    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
   }
 
   /**
@@ -204,11 +203,10 @@ export default class Playlist {
       throw error
     }
 
-    if (!this.sipapu.Session.sessionId) {
-      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
     }
 
-    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
   }
 
   /**

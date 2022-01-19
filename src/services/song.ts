@@ -205,10 +205,9 @@ export default class Song {
       throw error
     }
 
-    if (!this.sipapu.Session.sessionId) {
-      throw new Error('SessionID not set in sipapu.Session.sessionId')
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SONG_REMOVED, { error: false, songId })
     }
-    await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SONG_REMOVED, { error: false, songId })
   }
 
   /**
