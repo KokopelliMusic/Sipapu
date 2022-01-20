@@ -56,8 +56,9 @@ export default class Spotify {
   /**
    * Get the spotify access token from the database for the current user.
    * @returns The spotify session, containing the access token and refresh token. 
+   * If there is no one logged in this will return undefined
    */
-  async get(): Promise<SpotifyType> {
+  async get(): Promise<SpotifyType | undefined> {
     const uid = this.client.auth.user()?.id
 
     if (!uid) {
@@ -74,7 +75,7 @@ export default class Spotify {
     }
 
     if (data === null || data.length === 0) {
-      throw new Error('No spotify information found, did your spotify login fail?')
+      return undefined
     }
 
     return {
