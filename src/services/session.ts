@@ -39,6 +39,7 @@ export type PlayerEvents = 'adtrad' | 'opus' | 'random-word'
  * @param allowEvents allow events to happen in the player
  * @param eventFrequency Every x songs the player will (maybe) do an event (ignored if allowEvents is false)
  * @param allowedEvents All events in this list the player can choose to do  (ignored if allowEvents is false)
+ * @param randomWordList A list of words that the player can choose from when a random-word event happens
  * @param anyoneCanUsePlayerControls if false then only host can control playback (pause, play, etc)
  * @param anyoneCanAddToQueue if false then only host can add songs to the queue, ignoring the algorithm
  * @param anyoneCanSeeHistory if false then only host can see the history of events (eg when a song is played or skipped or a song is added)
@@ -55,7 +56,8 @@ export type SessionSettings = {
   allowEvents: boolean,               
   eventFrequency: number,             
   allowedEvents: Array<PlayerEvents>,
-  
+  randomWordList: string[],
+
   anyoneCanUsePlayerControls: boolean,
   anyoneCanAddToQueue: boolean,       
   
@@ -85,6 +87,7 @@ export const DEFAULT_SETTINGS: SessionSettings = {
   allowEvents: true,
   eventFrequency: 10,
   allowedEvents: ['adtrad'],
+  randomWordList: [],
   
   anyoneCanUsePlayerControls: true,
   anyoneCanAddToQueue: true,
