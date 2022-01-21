@@ -17,7 +17,7 @@ import { EventTypes, Event, parseEvent, EventData } from '../events'
  * <pre></pre>
  * WEIGHTED_SONG assignes weights to each song in the queue (based on how many times it has been played), and selects a song with the lowest weight (random if multiple with same weight)
  */
-enum QueueAlgorithms {
+export enum QueueAlgorithms {
   CLASSIC       = 'classic',
   MODERN        = 'modern',
   RANDOM        = 'random',
@@ -34,7 +34,7 @@ enum QueueAlgorithms {
  * RANDOM_WORD selects a random word from the wordList, disabled by default
  * 
  */
-enum PlayerEvents {
+export enum PlayerEvents {
   ADTRAD = 'adtrad',
   OPUS = 'opus',
   RANDOM_WORD = 'random-word',
