@@ -7,38 +7,29 @@ import { EventTypes, Event, parseEvent, EventData } from '../events'
 /**
  * All queueing algorithms the user can choose from
  * <pre></pre>
- * CLASSIC is the default and classic Kokopelli experience, weighted random on user
+ * 'classic' is the default and classic Kokopelli experience, weighted random on user
  * First the algorithm chooses an random user, then it uses weighted-song to select from the user's queue
  * <pre></pre>
- * MODERN assigns weights to each user (based on how many times they have played), and then uses weighted-song to select from the user's queue
+ * 'modern' assigns weights to each user (based on how many times they have played), and then uses weighted-song to select from the user's queue
  * basically the classic algo but better
  * <pre></pre>
- * RANDOM is pure random (garbage)
+ * 'random' is pure random (garbage)
  * <pre></pre>
- * WEIGHTED_SONG assignes weights to each song in the queue (based on how many times it has been played), and selects a song with the lowest weight (random if multiple with same weight)
+ * 'weighted-song' assignes weights to each song in the queue (based on how many times it has been played), and selects a song with the lowest weight (random if multiple with same weight)
  */
-export enum QueueAlgorithms {
-  CLASSIC       = 'classic',
-  MODERN        = 'modern',
-  RANDOM        = 'random',
-  WEIGHTED_SONG = 'weighted-song',
-}
+export type QueueAlgorithms = 'classic' | 'modern' | 'random' | 'weighted-song'
 
 /**
  * All the random events that can happen in the player
  * <pre></pre>
- * ADTRAD is the wheel of fortune, enabled by default
+ * 'adtrad is the wheel of fortune, enabled by default
  * <pre></pre>
- * OPUS plays the song Opus, disabled by default
+ * 'opus' plays the song Opus, disabled by default
  * <pre></pre>
- * RANDOM_WORD selects a random word from the wordList, disabled by default
+ * 'random-word' selects a random word from the wordList, disabled by default
  * 
  */
-export enum PlayerEvents {
-  ADTRAD = 'adtrad',
-  OPUS = 'opus',
-  RANDOM_WORD = 'random-word',
-}
+export type PlayerEvents = 'adtrad' | 'opus' | 'random-word'
 
 /**
  * All settings that a session can have
@@ -93,7 +84,7 @@ export const DEFAULT_SETTINGS: SessionSettings = {
   
   allowEvents: true,
   eventFrequency: 10,
-  allowedEvents: [PlayerEvents.ADTRAD],
+  allowedEvents: ['adtrad'],
   
   anyoneCanUsePlayerControls: true,
   anyoneCanAddToQueue: true,
@@ -102,7 +93,7 @@ export const DEFAULT_SETTINGS: SessionSettings = {
   anyoneCanSeeQueue: true,
   anyoneCanSeePlaylist: true,
 
-  algorithmUsed: QueueAlgorithms.MODERN,
+  algorithmUsed: 'modern',
 }
 
 /**
