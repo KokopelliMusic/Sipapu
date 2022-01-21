@@ -4,15 +4,106 @@ import { PlaylistType } from './playlist'
 import { SongType } from './song'
 import { EventTypes, Event, parseEvent, EventData } from '../events'
 
+/**
+ * All queueing algorithms the user can choose from
+ * <pre></pre>
+ * CLASSIC is the default and classic Kokopelli experience, weighted random on user
+ * First the algorithm chooses an random user, then it uses weighted-song to select from the user's queue
+ * <pre></pre>
+ * MODERN assigns weights to each user (based on how many times they have played), and then uses weighted-song to select from the user's queue
+ * basically the classic algo but better
+ * <pre></pre>
+ * RANDOM is pure random (garbage)
+ * <pre></pre>
+ * WEIGHTED_SONG assignes weights to each song in the queue (based on how many times it has been played), and selects a song with the lowest weight (random if multiple with same weight)
+ */
+enum QueueAlgorithms {
+  CLASSIC       = 'classic',
+  MODERN        = 'modern',
+  RANDOM        = 'random',
+  WEIGHTED_SONG = 'weighted-song',
+}
+
+/**
+ * All the random events that can happen in the player
+ * <pre></pre>
+ * ADTRAD is the wheel of fortune, enabled by default
+ * <pre></pre>
+ * OPUS plays the song Opus, disabled by default
+ * <pre></pre>
+ * RANDOM_WORD selects a random word from the wordList, disabled by default
+ * 
+ */
+enum PlayerEvents {
+  ADTRAD = 'adtrad',
+  OPUS = 'opus',
+  RANDOM_WORD = 'random-word',
+}
+
+/**
+ * All settings that a session can have
+ * @param allowSpotify If true, the session will allow Spotify songs to be added
+ * @param allowYoutube If true, the session will allow Youtube songs to be added
+ * @param youtubeOnlyAudio player hides the youtube video (ignored if allowYouTube is false)
+ * @param allowEvents allow events to happen in the player
+ * @param eventFrequency Every x songs the player will (maybe) do an event (ignored if allowEvents is false)
+ * @param allowedEvents All events in this list the player can choose to do  (ignored if allowEvents is false)
+ * @param anyoneCanUsePlayerControls if false then only host can control playback (pause, play, etc)
+ * @param anyoneCanAddToQueue if false then only host can add songs to the queue, ignoring the algorithm
+ * @param anyoneCanSeeHistory if false then only host can see the history of events (eg when a song is played or skipped or a song is added)
+ * @param anyoneCanSeeQueue if false then only host can see the queue of songs
+ * @param anyoneCanSeePlaylist if false then only host can see the playlist
+ * @param algorithmUsed The Algorithm that this session will use to select songs from the queue
+ */
+export type SessionSettings = {
+  allowSpotify: boolean,     
+  allowYouTube: boolean,     
+  youtubeOnlyAudio: boolean, 
+  // other sources added later
+  
+  allowEvents: boolean,               
+  eventFrequency: number,             
+  allowedEvents: Array<PlayerEvents>,
+  
+  anyoneCanUsePlayerControls: boolean,
+  anyoneCanAddToQueue: boolean,       
+  
+  anyoneCanSeeHistory: boolean,
+  anyoneCanSeeQueue: boolean,
+  anyoneCanSeePlaylist: boolean,
+
+  algorithmUsed: QueueAlgorithms,
+}
+
 export type SessionType = {
   id: string
   createdAt: Date
   user: string
   playlistId: number
   currentlyPlaying: SongType
+  settings: SessionSettings
 }
 
 export const EMPTY_EVENT_DATA: EventData = { error: false }
+
+export const DEFAULT_SETTINGS: SessionSettings = {
+  allowSpotify: true,
+  allowYouTube: true,
+  youtubeOnlyAudio: false,
+  
+  allowEvents: true,
+  eventFrequency: 10,
+  allowedEvents: [PlayerEvents.ADTRAD],
+  
+  anyoneCanUsePlayerControls: true,
+  anyoneCanAddToQueue: true,
+  
+  anyoneCanSeeHistory: true,
+  anyoneCanSeeQueue: true,
+  anyoneCanSeePlaylist: true,
+
+  algorithmUsed: QueueAlgorithms.MODERN,
+}
 
 /**
  * Session class, defining a session and all methods that can query anything related to Sessions.
@@ -85,12 +176,21 @@ export default class Session {
    * @param playlistId The id of the playlist to use
    * @throws {@link Error} If the new session doesn't exist
    */
-  async claim(playlistId: number, sessionId: string): Promise<void> {
+  async claim(playlistId: number, sessionId: string, settings: SessionSettings): Promise<void> {
     const { error } = await this.client
       .rpc('claim_session', { session_id: sessionId, user_id: this.client.auth.user()?.id, playlist_id: playlistId })
 
     if (error !== null) {
       throw error
+    }
+
+    const res = await this.client
+      .from('session')
+      .update({ settings })
+      .match({ id: sessionId })
+
+    if (res.error !== null) {
+      throw res.error
     }
     
     this.sessionId = sessionId
@@ -147,7 +247,8 @@ export default class Session {
       createdAt: new Date(data[0].created_at),
       user: data[0].user_id,
       playlistId: data[0].playlist,
-      currentlyPlaying: data[0].currently_playing
+      currentlyPlaying: data[0].currently_playing,
+      settings: data[0].settings,
     }
   }
   
@@ -167,6 +268,19 @@ export default class Session {
     }
 
     await this.notifyEvent(sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
+  }
+
+  async updateSettings(sessionId: string, settings: SessionSettings): Promise<void> {
+    const { error } = await this.client
+      .from('session')
+      .update({ settings })
+      .match({ id: sessionId })
+
+    if (error !== null) {
+      throw error
+    }
+
+    await this.notifyEvent(sessionId, EventTypes.SESSION_SETTINGS_CHANGED, settings)
   }
 
   /**

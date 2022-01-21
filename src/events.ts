@@ -1,11 +1,12 @@
 import { SongType, SpotifySongCreateType, YoutubeSongCreateType } from './services/song'
 
+
 export enum EventTypes {
   GENERIC = 'generic',
 
   SESSION_CREATED = 'session_created',
   SESSION_REMOVED = 'session_removed',
-  
+
   SKIP_SONG = 'skip_song',
   PLAY_SONG = 'play_song',
   PREVIOUS_SONG = 'previous_song',
@@ -24,6 +25,7 @@ export enum EventTypes {
   SPOTIFY_ERROR = 'spotify_error',
   YOUTUBE_ERROR = 'youtube_error',
   PLAYLIST_TOO_SMALL_ERROR = 'playlist_too_small_error',
+  SESSION_SETTINGS_CHANGED = 'SESSION_SETTINGS_CHANGED'
 }
  
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -122,5 +124,7 @@ export const parseEvent = (eventType: EventTypes, data: unknown): EventData => {
       return data as YoutubeErrorEventData
     case EventTypes.PLAYLIST_TOO_SMALL_ERROR:
       return data as PlaylistTooSmallError
+    case EventTypes.SESSION_SETTINGS_CHANGED:
+      return data as SessionCreatedEventData
   } 
 }
