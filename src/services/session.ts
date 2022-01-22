@@ -209,7 +209,7 @@ export default class Session {
     // We can disable the non null assesion here since that method throws an error if it is null so this code is never reached
     const { error } = await this.client
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .rpc('add_user_to_playlist', { playlist_id: session!.playlistId, user_id: user })
+      .rpc('add_user_to_playlist', { playlist_id: session!.playlistId, uid: user })
 
     if (error !== null) {
       throw error
