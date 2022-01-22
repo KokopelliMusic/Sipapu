@@ -171,22 +171,18 @@ export default class Session {
    * @throws {@link Error} If the new session doesn't exist
    */
   async claim(playlistId: number, sessionId: string, settings: SessionSettings): Promise<void> {
-    const { error } = await this.client
-      .rpc('claim_session', { session_id: sessionId, user_id: this.client.auth.user()?.id, playlist_id: playlistId })
+    const { data, error } = await this.client
+      .rpc('claim_session', { 
+        session_id: sessionId, 
+        user_id: this.client.auth.user()?.id, 
+        playlist_id: playlistId,
+        settings
+      })
 
     if (error !== null) {
       throw error
     }
 
-    const res = await this.client
-      .from('session')
-      .update({ settings })
-      .match({ id: sessionId })
-
-    if (res.error !== null) {
-      throw res.error
-    }
-    
     this.sessionId = sessionId
   }
 
