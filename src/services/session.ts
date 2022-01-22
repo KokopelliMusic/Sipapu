@@ -171,7 +171,7 @@ export default class Session {
    * @throws {@link Error} If the new session doesn't exist
    */
   async claim(playlistId: number, sessionId: string, settings: SessionSettings): Promise<void> {
-    const { data, error } = await this.client
+    const { error } = await this.client
       .rpc('claim_session', { 
         session_id: sessionId, 
         user_id: this.client.auth.user()?.id, 
@@ -202,6 +202,10 @@ export default class Session {
     const session = await this.get(sessionId)
       .catch(error => { throw error })
 
+    if (!session) {
+      throw new Error('Session not found')
+    }
+
     // We can disable the non null assesion here since that method throws an error if it is null so this code is never reached
     const { error } = await this.client
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -228,7 +232,11 @@ export default class Session {
       .select()
       .match({ id: sessionId })
 
-    if (error === null || data === null || data.length === 0) {
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null || data.length === 0) {
       return undefined
     }
 
