@@ -382,5 +382,25 @@ export default class Session {
       throw error
     }
   }
+
+  /**
+   * Set the currently playing song for the current session
+   * If this.sessionId is set, then this function uses that value
+   * @param sessionId The id of the session to lookup
+   * @param song The song to set as currently playing
+   */
+  async setCurrentlyPlaying(sessionId: string, song: SongType): Promise<void> {
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+    
+    const { error } = await this.client
+      .from('session')
+      .update({ currently_playing: song })
+      .match({ id: sessionId })
+
+    if (error) 
+      throw error
+  }
 }
 
