@@ -10,8 +10,7 @@ export enum EventTypes {
   SKIP_SONG = 'skip_song',
   PLAY_SONG = 'play_song',
   PREVIOUS_SONG = 'previous_song',
-  RESUME_PLAYBACK = 'resume_playback',
-  PAUSE_PLAYBACK = 'pause_playback',
+  PLAY_PAUSE = 'play_pause',
 
   YOUTUBE_SONG_ADDED = 'youtube_song_added',
   SPOTIFY_SONG_ADDED = 'spotify_song_added',
@@ -50,10 +49,7 @@ export type PlaySongEventData = EventData & { song: SongType }
 export type PreviousSongEventData = EventData & {}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type ResumePlaybackEventData = EventData & {}
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type PausePlaybackEventData = EventData & {}
+export type PlayPauseEventData = EventData & {}
 
 export type YoutubeSongAddedEventData = EventData & { song: YoutubeSongCreateType }
 
@@ -100,10 +96,8 @@ export const parseEvent = (eventType: EventTypes, data: unknown): EventData => {
       return data as PlaySongEventData
     case EventTypes.PREVIOUS_SONG:
       return data as PreviousSongEventData
-    case EventTypes.RESUME_PLAYBACK:
-      return data as ResumePlaybackEventData
-    case EventTypes.PAUSE_PLAYBACK:
-      return data as PausePlaybackEventData
+    case EventTypes.PLAY_PAUSE:
+      return data as PlayPauseEventData
     case EventTypes.YOUTUBE_SONG_ADDED:
       return data as YoutubeSongAddedEventData
     case EventTypes.SPOTIFY_SONG_ADDED:
