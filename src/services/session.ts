@@ -39,6 +39,7 @@ export type PlayerEvents = 'adtrad' | 'opus' | 'random-word'
  * @param allowEvents allow events to happen in the player
  * @param eventFrequency Every x songs the player will (maybe) do an event (ignored if allowEvents is false)
  * @param allowedEvents All events in this list the player can choose to do  (ignored if allowEvents is false)
+ * @param randomWordList A list of words that the player can choose from when a random-word event happens
  * @param anyoneCanUsePlayerControls if false then only host can control playback (pause, play, etc)
  * @param anyoneCanAddToQueue if false then only host can add songs to the queue, ignoring the algorithm
  * @param anyoneCanSeeHistory if false then only host can see the history of events (eg when a song is played or skipped or a song is added)
@@ -55,7 +56,8 @@ export type SessionSettings = {
   allowEvents: boolean,               
   eventFrequency: number,             
   allowedEvents: Array<PlayerEvents>,
-  
+  randomWordList: string[],
+
   anyoneCanUsePlayerControls: boolean,
   anyoneCanAddToQueue: boolean,       
   
@@ -85,6 +87,7 @@ export const DEFAULT_SETTINGS: SessionSettings = {
   allowEvents: true,
   eventFrequency: 10,
   allowedEvents: ['adtrad'],
+  randomWordList: [],
   
   anyoneCanUsePlayerControls: true,
   anyoneCanAddToQueue: true,
@@ -169,21 +172,17 @@ export default class Session {
    */
   async claim(playlistId: number, sessionId: string, settings: SessionSettings): Promise<void> {
     const { error } = await this.client
-      .rpc('claim_session', { session_id: sessionId, user_id: this.client.auth.user()?.id, playlist_id: playlistId })
+      .rpc('claim_session', { 
+        session_id: sessionId, 
+        user_id: this.client.auth.user()?.id, 
+        playlist_id: playlistId,
+        settings
+      })
 
     if (error !== null) {
       throw error
     }
 
-    const res = await this.client
-      .from('session')
-      .update({ settings })
-      .match({ id: sessionId })
-
-    if (res.error !== null) {
-      throw res.error
-    }
-    
     this.sessionId = sessionId
   }
 
@@ -203,10 +202,14 @@ export default class Session {
     const session = await this.get(sessionId)
       .catch(error => { throw error })
 
+    if (!session) {
+      throw new Error('Session not found')
+    }
+
     // We can disable the non null assesion here since that method throws an error if it is null so this code is never reached
     const { error } = await this.client
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .rpc('add_user_to_playlist', { playlist_id: session!.playlistId, user_id: user })
+      .rpc('add_user_to_playlist', { playlist_id: session!.playlistId, uid: user })
 
     if (error !== null) {
       throw error
@@ -229,7 +232,11 @@ export default class Session {
       .select()
       .match({ id: sessionId })
 
-    if (error === null || data === null || data.length === 0) {
+    if (error !== null) {
+      throw error
+    }
+
+    if (data === null || data.length === 0) {
       return undefined
     }
 
@@ -374,6 +381,26 @@ export default class Session {
     } catch (error) {
       throw error
     }
+  }
+
+  /**
+   * Set the currently playing song for the current session
+   * If this.sessionId is set, then this function uses that value
+   * @param sessionId The id of the session to lookup
+   * @param song The song to set as currently playing
+   */
+  async setCurrentlyPlaying(sessionId: string, song: SongType): Promise<void> {
+    if (this.sessionId !== undefined) {
+      sessionId = this.sessionId
+    }
+    
+    const { error } = await this.client
+      .from('session')
+      .update({ currently_playing: song })
+      .match({ id: sessionId })
+
+    if (error) 
+      throw error
   }
 }
 
