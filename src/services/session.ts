@@ -185,6 +185,8 @@ export default class Session {
     }
 
     this.sessionId = sessionId
+
+    this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings })
   }
 
   /**

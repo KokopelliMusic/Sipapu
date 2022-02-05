@@ -1,3 +1,4 @@
+import { SessionSettings } from './services/session'
 import { SongType, SpotifySongCreateType, YoutubeSongCreateType } from './services/song'
 
 
@@ -35,7 +36,9 @@ export type EventData = {
 export type GenericEventData = EventData & unknown
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type SessionCreatedEventData = EventData & {}
+export type SessionCreatedEventData = EventData & {
+  settings: SessionSettings
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type SessionRemovedEventData = EventData & {}
