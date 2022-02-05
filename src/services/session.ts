@@ -161,7 +161,8 @@ export default class Session {
 
     await this.notifyEvent(data[0].id, EventTypes.SESSION_CREATED, EMPTY_EVENT_DATA)
 
-    return data[0]
+    // haha typescript
+    return data as unknown as string
   }
 
   /**
