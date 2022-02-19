@@ -159,8 +159,6 @@ export default class Session {
       throw new Error('Something went wrong: Session not created')
     }
 
-    await this.notifyEvent(data[0].id, EventTypes.SESSION_CREATED, EMPTY_EVENT_DATA)
-
     // haha typescript
     return data as unknown as string
   }
