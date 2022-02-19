@@ -25,7 +25,7 @@ export enum EventTypes {
   SPOTIFY_ERROR = 'spotify_error',
   YOUTUBE_ERROR = 'youtube_error',
   PLAYLIST_TOO_SMALL_ERROR = 'playlist_too_small_error',
-  SESSION_SETTINGS_CHANGED = 'SESSION_SETTINGS_CHANGED'
+  SESSION_SETTINGS_CHANGED = 'session_settings_changed'
 }
  
 // eslint-disable-next-line @typescript-eslint/ban-types
