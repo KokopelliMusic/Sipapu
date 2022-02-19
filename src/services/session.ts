@@ -161,7 +161,8 @@ export default class Session {
 
     await this.notifyEvent(data[0].id, EventTypes.SESSION_CREATED, EMPTY_EVENT_DATA)
 
-    return data[0]
+    // haha typescript
+    return data as unknown as string
   }
 
   /**
@@ -184,6 +185,8 @@ export default class Session {
     }
 
     this.sessionId = sessionId
+
+    this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings })
   }
 
   /**
@@ -288,9 +291,9 @@ export default class Session {
    * If this.sessionId is set, then this function uses that value
    * @param sessionId The id of the session to watch, if the
    * @param callback The function to call when an event is received, it passes the event in the correct type
-   * 
+   * @returns A function that closes the stream
    */
-  async watch(sessionId: string, callback: (event: Event) => unknown): Promise<void> {
+  async watch(sessionId: string, callback: (event: Event) => unknown): Promise<() => void> {
 
     if (this.sessionId !== undefined) {
       sessionId = this.sessionId
@@ -298,12 +301,16 @@ export default class Session {
 
     const url = `${this.sipapu.tawaUrl}/stream/session/${sessionId}`
     const stream = new EventSource(url)
-    stream.addEventListener('message', msg => {
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    stream.addEventListener('message', (msg: MessageEvent<any>): void => {
       console.log('[SIPAPU] New event:', msg)
       const parsedEventData = parseEvent(msg.data.eventType, msg.data.data)
       const cbevent: Event = Object.assign({}, msg.data, { data: parsedEventData })
       callback(cbevent)
     })
+
+    return () => stream.close()
   }
 
   /**
