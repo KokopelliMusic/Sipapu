@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
 import { PlaylistType } from './playlist'
 import { SongType } from './song'
-import { EventTypes, Event, parseEvent, EventData } from '../events'
+import { EventTypes, Event, EventData } from '../events'
 
 /**
  * All queueing algorithms the user can choose from
