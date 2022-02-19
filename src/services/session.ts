@@ -304,10 +304,9 @@ export default class Session {
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     stream.addEventListener('message', (msg: MessageEvent<any>): void => {
-      console.log('[SIPAPU] New event:', msg)
-      const parsedEventData = parseEvent(msg.data.eventType, msg.data.data)
-      const cbevent: Event = Object.assign({}, msg.data, { data: parsedEventData })
-      callback(cbevent)
+      const data = JSON.parse(msg.data)
+      console.log('[SIPAPU] New event:', data)
+      callback(data)
     })
 
     return () => stream.close()
