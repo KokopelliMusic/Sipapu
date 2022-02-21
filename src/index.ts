@@ -111,6 +111,21 @@ export class Sipapu {
     localStorage.setItem('sipapu:access_token', session.access_token)
   }
 
+  /**
+   * Sign in with an JWT access token instead of email/password
+   * This is used for the webplayer
+   * @param apiKey 
+   */
+  async signInWithKey(apiKey: string): Promise<void> {
+    const session = await this.client.auth.setAuth(apiKey)
+
+    if (session === null) {
+      throw new Error('This API key is not valid')
+    }
+
+    localStorage.setItem('sipapu:access_token', session.access_token)
+  }
+
   static getTokenFromLocalStorage(): string | null {
     return localStorage.getItem('sipapu:access_token')
   }
