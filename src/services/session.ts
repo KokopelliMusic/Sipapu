@@ -184,8 +184,6 @@ export default class Session {
 
     this.sessionId = sessionId
 
-    const jwt = JSON.parse(localStorage.getItem('supabase.auth.token') as string)
-
     this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings })
   }
 
