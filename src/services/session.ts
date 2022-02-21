@@ -186,7 +186,7 @@ export default class Session {
 
     const jwt = JSON.parse(localStorage.getItem('supabase.auth.token') as string)
 
-    this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings, jwt: jwt.currentSession.access_token })
+    this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings, refreshToken: jwt.currentSession.refresh_token })
   }
 
   /**
