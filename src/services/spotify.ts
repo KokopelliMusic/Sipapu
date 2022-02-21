@@ -121,7 +121,7 @@ export default class Spotify {
       .rpc('update_spotify_token', {
         uid,
         token: newToken,
-        expire_date: newExpiration.toISOString(),
+        expire_date: newExpiration,
       })
 
     if (error !== null) {
