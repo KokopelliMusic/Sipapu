@@ -119,7 +119,7 @@ export default class Spotify {
   async updateToken(newToken: string, newExpiration: Date, uid: string): Promise<void> {
     const { error } = await this.client
       .rpc('update_spotify_token', {
-        user_id: uid,
+        uid,
         token: newToken,
         expires_at: newExpiration.toISOString(),
       })
