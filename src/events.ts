@@ -37,7 +37,9 @@ export type GenericEventData = EventData & unknown
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type SessionCreatedEventData = EventData & {
-  settings: SessionSettings
+  settings: SessionSettings,
+  spotifyAccessToken: string,
+  spotifyRefreshToken: string,
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

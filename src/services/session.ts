@@ -184,7 +184,19 @@ export default class Session {
 
     this.sessionId = sessionId
 
-    this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, { settings })
+    await this.sipapu.Spotify.get()
+      .then(async spotify => {
+        if (!spotify) {
+          throw new Error('Spotify is undefined')
+        }
+
+        return await this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, {
+          settings, 
+          spotifyAccessToken: spotify.accessToken,
+          spotifyRefreshToken: spotify.refreshToken
+        })
+      })
+      .catch(error => { throw error })
   }
 
   /**
