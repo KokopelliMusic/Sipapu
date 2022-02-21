@@ -38,7 +38,7 @@ export type GenericEventData = EventData & unknown
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type SessionCreatedEventData = EventData & {
   settings: SessionSettings,
-  jwt: string
+  refreshToken: string
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
