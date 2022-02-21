@@ -118,12 +118,11 @@ export default class Spotify {
    */
   async updateToken(newToken: string, newExpiration: Date, uid: string): Promise<void> {
     const { error } = await this.client
-      .from('spotify')
-      .update({
-        access_token: newToken,
-        expires_at: newExpiration.toISOString(),
+      .rpc('update_spotify_token', {
+        user_id: uid,
+        token: newToken,
+        exires_at: newExpiration.toISOString(),
       })
-      .match({ user_id: uid })
 
     if (error !== null) {
       throw error
