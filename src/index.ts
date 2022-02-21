@@ -112,17 +112,22 @@ export class Sipapu {
   }
 
   /**
-   * Sign in with an JWT access token instead of email/password
+   * Sign in with a Session object instead of email/password
    * This is used for the webplayer
-   * @param apiKey 
+   * @param refreshToken the refreshtoken, taken from a valid session
    */
-  async signInWithKey(apiKey: string): Promise<void> {
-    const session = await this.client.auth.setAuth(apiKey)
+  async signInWithSession(refreshToken: string): Promise<void> {
+    const { session, error } = await this.client.auth.setSession(refreshToken)
 
-    if (session === null) {
-      throw new Error('This API key is not valid')
+    if (error !== null) {
+      throw error
     }
 
+    if (session === null) {
+      throw new Error('This Refresh Token is not valid')
+    }
+
+    this.client.auth.setAuth(session.access_token)
     localStorage.setItem('sipapu:access_token', session.access_token)
   }
 
