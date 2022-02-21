@@ -113,15 +113,10 @@ export default class Spotify {
    * Updates the spotify token in the database
    * @param newToken The new access token
    * @param newExpiration The new expiration date for the token
+   * @param uid User ID for the user to update
    * @throws Error if the user is not logged in or something else fails
    */
-  async updateToken(newToken: string, newExpiration: Date): Promise<void> {
-    const uid = this.client.auth.user()?.id
-
-    if (!uid) {
-      throw new Error('You are not logged in!')
-    }
-
+  async updateToken(newToken: string, newExpiration: Date, uid: string): Promise<void> {
     const { error } = await this.client
       .from('spotify')
       .update({

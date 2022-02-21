@@ -193,7 +193,8 @@ export default class Session {
         return await this.notifyEvent(sessionId, EventTypes.SESSION_CREATED, {
           settings, 
           spotifyAccessToken: spotify.accessToken,
-          spotifyRefreshToken: spotify.refreshToken
+          spotifyRefreshToken: spotify.refreshToken,
+          userId: this.client.auth.user()?.id,
         })
       })
       .catch(error => { throw error })

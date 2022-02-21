@@ -40,6 +40,7 @@ export type SessionCreatedEventData = EventData & {
   settings: SessionSettings,
   spotifyAccessToken: string,
   spotifyRefreshToken: string,
+  userId: string
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
