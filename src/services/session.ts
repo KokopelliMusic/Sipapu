@@ -73,7 +73,7 @@ export type SessionType = {
   createdAt: Date
   user: string
   playlistId: number
-  currentlyPlaying: SongType
+  currentlyPlaying: number
   settings: SessionSettings
 }
 
@@ -379,10 +379,10 @@ export default class Session {
    * Get the currently playing song for the current session
    * If this.sessionId is set, then this function uses that value
    * @param sessionId The id of the session to lookup
-   * @returns Promise<SongType> The song that is currently playing
+   * @returns Promise<number> The song_id that is currently playing
    * @throws {@link Error} If the session doesn't exist or the user doesn't have access to it
    */
-  async getCurrentlyPlaying(sessionId: string): Promise<SongType> {
+  async getCurrentlyPlaying(sessionId: string): Promise<number> {
     if (this.sessionId !== undefined) {
       sessionId = this.sessionId
     }
