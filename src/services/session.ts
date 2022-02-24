@@ -406,14 +406,14 @@ export default class Session {
    * @param sessionId The id of the session to lookup
    * @param song The song to set as currently playing
    */
-  async setCurrentlyPlaying(sessionId: string, song: SongType): Promise<void> {
+  async setCurrentlyPlaying(sessionId: string, songId: number): Promise<void> {
     if (this.sessionId !== undefined) {
       sessionId = this.sessionId
     }
     
     const { error } = await this.client
       .from('session')
-      .update({ currently_playing: song })
+      .update({ currently_playing: songId })
       .match({ id: sessionId })
 
     if (error) 
