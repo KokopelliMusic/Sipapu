@@ -182,7 +182,7 @@ export default class Playlist {
     }
 
     if (this.sipapu.Session.sessionId) {
-      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, EMPTY_EVENT_DATA)
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.PLAYLIST_FINISHED, EMPTY_EVENT_DATA)
     }
   }
 
@@ -204,7 +204,7 @@ export default class Playlist {
     }
 
     if (this.sipapu.Session.sessionId) {
-      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.SESSION_REMOVED, { error: false, user: userId })
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.NEW_USER, { error: false, user: userId })
     }
 
   }
