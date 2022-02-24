@@ -99,6 +99,21 @@ export default class Playlist {
     }
   }
 
+  async reset(playlistId: number): Promise<void> {
+    const { error } = await this.client
+      .rpc('reset_playlist', { playlist_id: playlistId })
+
+
+    if (error !== null) {
+      throw error
+    }
+
+    if (this.sipapu.Session.sessionId) {
+      await this.sipapu.Session.notifyEvent(this.sipapu.Session.sessionId, EventTypes.PLAYLIST_FINISHED, {})
+    }
+
+  }
+
   /**
    * Get a playlist with all songs that are in this playlist
    * @param playlistId The playlist id to query
