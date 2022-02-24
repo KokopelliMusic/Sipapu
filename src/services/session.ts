@@ -1,7 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Sipapu } from '..'
 import { PlaylistType } from './playlist'
-import { SongType } from './song'
 import { EventTypes, Event, EventData } from '../events'
 
 /**
